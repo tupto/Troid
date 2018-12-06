@@ -1,18 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Troid.Entities;
+using Troid.World;
 
 namespace Troid
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game1 : Game
+    public class Troid : Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        public Game1()
+        Room testRoom;
+        Player player;
+
+        public Troid()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -26,7 +31,14 @@ namespace Troid
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            graphics.PreferredBackBufferWidth = 240;
+            graphics.PreferredBackBufferHeight = 160;
+            graphics.ApplyChanges();
+
+            testRoom = new Room(30, 20);
+            player = new Player(testRoom);
+
+            testRoom.Entities.Add(player);
 
             base.Initialize();
         }
@@ -40,7 +52,9 @@ namespace Troid
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            player.SpriteSheet = Content.Load<Texture2D>("charsprites");
+            Tile.TileSheet = Content.Load<Texture2D>("tiles");
+            Beam.BeamTex = Content.Load<Texture2D>("beam");
         }
 
         /// <summary>
@@ -61,8 +75,8 @@ namespace Troid
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            // TODO: Add your update logic here
+            
+            testRoom.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -75,7 +89,11 @@ namespace Troid
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+
+            testRoom.Draw(spriteBatch);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
