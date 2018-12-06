@@ -16,6 +16,7 @@ namespace Troid
 
         Room testRoom;
         Player player;
+        Enemy spinner;
 
         public Troid()
         {
@@ -37,8 +38,10 @@ namespace Troid
 
             testRoom = new Room(30, 20);
             player = new Player(testRoom);
+            spinner = new Enemy(testRoom);
 
             testRoom.Entities.Add(player);
+            testRoom.Entities.Add(spinner);
 
             base.Initialize();
         }
@@ -53,6 +56,7 @@ namespace Troid
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             player.SpriteSheet = Content.Load<Texture2D>("charsprites");
+            spinner.SpriteSheet = Content.Load<Texture2D>("spin");
             Tile.TileSheet = Content.Load<Texture2D>("tiles");
             Beam.BeamTex = Content.Load<Texture2D>("beam");
         }

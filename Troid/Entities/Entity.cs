@@ -135,6 +135,21 @@ namespace Troid.Entities
                 OnWallHit();
         }
 
+        public void AdjustHealth(int amount)
+        {
+            Health += amount;
+
+            if (Health > MaxHealth)
+            {
+                Health = MaxHealth;
+            }
+            else if (Health <= 0)
+            {
+                Health = 0;
+                Alive = false;
+            }
+        }
+
         private void PushOutOfTile(Rectangle tileBounds)
         {
             Vector2 collisionDept = Hitbox.GetIntersectionDepth(tileBounds);

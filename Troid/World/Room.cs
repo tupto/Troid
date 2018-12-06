@@ -27,7 +27,7 @@ namespace Troid.World
             {
                 for (int y = 0; y < height; y++)
                 {
-                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1 || (x > width / 2 && y > height / 2) || y < height / 2)
+                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1 || (x > width / 2 && y > height / 2))
                     {
                         Tiles[x, y] = new Tile((x + y) % 2);
                     }
