@@ -32,25 +32,81 @@ namespace Troid.World
             {
                 for (int y = 0; y < height; y++)
                 {
-                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1 || (x > width / 2 && y > height / 2))
+                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1 || y > height / 2)
                     {
-                        Tiles[x, y] = new Tile((x + y) % 2);
+						Tiles[x, y] = new Tile(0);
                     }
                 }
             }
+
+			for (int x = 0; x < width; x++)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					if (Tiles[x, y] == null)
+						continue;
+
+					if (x == 0)
+					{
+						if (y == 0 || y == height - 1)
+						{
+							Tiles[x, y] = new Tile(5);
+						}
+						else
+						{
+							Tiles[x, y] = new Tile(4);
+						}
+					}
+					else if (y == 0)
+					{
+						Tiles[x, y] = new Tile(2);
+					}
+					else if (x == width - 1 && !(x > width / 2 && y > height / 2))
+					{
+						Tiles[x, y] = new Tile(3);
+					}
+					else if (y == height - 1 && !(x > width / 2 && y > height / 2))
+					{
+						Tiles[x, y] = new Tile(2);
+					}
+					else if (x - 1 == width / 2)
+					{
+						if (y - 1 == height / 2)
+						{
+							Tiles[x, y] = new Tile(0);
+						}
+						else
+						{
+							Tiles[x, y] = new Tile(3);
+						}
+					}
+					else if (y - 1 == height / 2 && x - 1 > width / 2)
+					{
+						Tiles[x, y] = new Tile(2);
+					}
+					else if (y > height / 2 && x -1 < width / 2)
+					{
+						Tiles[x, y] = new Tile(8, TileCollision.Water);
+					}
+					else
+					{
+						Tiles[x, y] = new Tile(5);
+					}
+				}
+			}
         }
 
-        public bool TileHasCollision(int x, int y)
+        public TileCollision GetTileCollision(int x, int y)
         {
             if (Tiles.Length <= x + y * Width || x + y * Width < 0 || x < 0 || y < 0 || x >= Width || y >= Height)
-                return false;
+				return TileCollision.None;
 
             if (Tiles[(int)x, (int)y] != null)
             {
-                return Tiles[(int)x, (int)y].Solid;
+				return Tiles[(int)x, (int)y].CollisionType;
             }
 
-            return false;
+			return TileCollision.None;
         }
 
         public Rectangle GetTileBouds(int x, int y)
@@ -94,12 +150,26 @@ namespace Troid.World
 
         public void Draw(SpriteBatch spriteBatch)
         {
+			List<Tile> waterTiles = new List<Tile>();
+			List<int> waterTilesX = new List<int>();
+			List<int> waterTilesY = new List<int>();
             for (int x = 0; x < Width; x++)
             {
                 for (int y = 0; y < Height; y++)
                 {
-                    if (Tiles[x, y] != null)
-                        Tiles[x, y].Draw(x, y, spriteBatch);
+					if (Tiles[x, y] != null)
+					{
+						if (Tiles[x, y].CollisionType != TileCollision.Water)
+						{
+							Tiles[x, y].Draw(x, y, spriteBatch);
+						}
+						else
+						{
+							waterTiles.Add(Tiles[x, y]);
+							waterTilesX.Add(x);
+							waterTilesY.Add(y);
+						}
+					}
                 }
             }
 
@@ -107,6 +177,11 @@ namespace Troid.World
             {
                 Entities[i].Draw(spriteBatch);
             }
+
+			for (int i = 0; i < waterTiles.Count; i++)
+			{
+				waterTiles[i].Draw(waterTilesX[i], waterTilesY[i], spriteBatch);
+			}
         }
     }
 }

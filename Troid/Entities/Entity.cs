@@ -22,6 +22,7 @@ namespace Troid.Entities
         public bool Jumping;
         public bool ApplyGravity;
         public bool OnGround;
+		public bool InWater;
         public Room Room;
         public Direction Direction;
         public bool Alive;
@@ -34,16 +35,19 @@ namespace Troid.Entities
         public float JumpControlPower = 0.2f;
         public float KnockbackVelocity = 500.0f;
         public float KnockbackControlPower = 0.2f;
+		public float WaterSpeedModifier = 0.3f;
         public float MaxJumpTime = 0.50f;
         public float MaxKnockbackTime = 0.50f;
+		public float DrownTime = 5.0f;
         public float MaxYSpeed = 500.0f;
         public float MaxXSpeed = 500.0f;
 
         private int previousBottom;
-        private Vector2 previousPosition;
 
         private bool wasJumping;
         private float jumpTimer;
+		private bool wasInWater;
+		private float waterTimer;
         private bool beingKnockedback;
         private float knockbackTimer;
         private Vector2 knockbackDirection;
@@ -82,6 +86,7 @@ namespace Troid.Entities
             int worldTop = (int)Math.Floor((float)Hitbox.Top / Tile.TILE_HEIGHT);
             int worldBottom = (int)Math.Ceiling((float)Hitbox.Bottom / Tile.TILE_HEIGHT);
 
+			InWater = false;
             OnGround = previousBottom == Hitbox.Bottom && Velocity.Y == 0;
             somethingBelow = false;
 
@@ -91,16 +96,22 @@ namespace Troid.Entities
             {
                 for (int y = worldTop; y <= worldBottom; y++)
                 {
-                    if (Room.TileHasCollision(x, y))
-                    {
-                        Rectangle tileBounds = Room.GetTileBouds(x, y);
-                        hitSomething = PushOutOfTile(tileBounds) || hitSomething;
-                        
-                        if (y == worldBottom || y == worldBottom - 1)
-                        {
-                            somethingBelow = true;
-                        }
-                    }
+					TileCollision colType = Room.GetTileCollision(x, y);
+
+					if (colType == TileCollision.Solid)
+					{
+						Rectangle tileBounds = Room.GetTileBouds(x, y);
+						hitSomething = PushOutOfTile(tileBounds) || hitSomething;
+
+						if (y == worldBottom || y == worldBottom - 1)
+						{
+							somethingBelow = true;
+						}
+					}
+					else if (colType == TileCollision.Water)
+					{
+						InWater = InWater || Hitbox.Intersects(Room.GetTileBouds(x, y));
+					}
                 }
             }
 
@@ -157,7 +168,7 @@ namespace Troid.Entities
         {
             if (Jumping)
             {
-                if ((!wasJumping && OnGround) || jumpTimer > 0.0f)
+				if ((!wasJumping && (OnGround || InWater)) || jumpTimer > 0.0f)
                 {
                     jumpTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }
@@ -178,6 +189,29 @@ namespace Troid.Entities
 
             wasJumping = Jumping;
         }
+
+		public void DoWater(GameTime gameTime)
+		{
+			if (InWater)
+			{
+				waterTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+				if (waterTimer >= DrownTime)
+				{
+					AdjustHealth(-25);
+					Knockback(new Vector2(0, -1));
+					waterTimer = 0.2f * DrownTime;
+				}
+
+				Velocity *= WaterSpeedModifier;
+			}
+			else
+			{
+				waterTimer = 0.0f;
+			}
+
+			wasInWater = InWater;
+		}
 
         private bool PushOutOfTile(Rectangle tileBounds)
         {
@@ -239,10 +273,13 @@ namespace Troid.Entities
 
             DoJump(gameTime);
             DoKnockback(gameTime);
+			DoWater(gameTime);
 
             Position += Velocity * elapsed;
 
             HandleRoomCollisions();
+
+			wasInWater = InWater;
 
             if (Position.X == previousPosition.X)
                 Velocity.X = 0;
@@ -263,7 +300,8 @@ namespace Troid.Entities
                 animationRect = Animations[CurrAnimation].GetFrame();
             }
 
-            spriteBatch.Draw(SpriteSheet, Position, animationRect, Color.White, 0, Vector2.Zero, 1, effects, 0);
+			spriteBatch.Draw(SpriteSheet, Position, animationRect,
+			                 Color.White, 0, Vector2.Zero, new Vector2(1, 1), effects, 0.0f);
         }
 
         public virtual void OnWallHit() { }

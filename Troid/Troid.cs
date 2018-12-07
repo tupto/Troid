@@ -35,8 +35,8 @@ namespace Troid
         /// </summary>
         protected override void Initialize()
         {
-            graphics.PreferredBackBufferWidth = 240;
-            graphics.PreferredBackBufferHeight = 160;
+            graphics.PreferredBackBufferWidth = 240 * 4;
+            graphics.PreferredBackBufferHeight = 160 * 4;
             graphics.ApplyChanges();
 
             testRoom = new Room(30, 20);
@@ -99,14 +99,14 @@ namespace Troid
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateScale(4));
 
             testRoom.Draw(spriteBatch);
 
-            foreach (Rectangle rect in testRoom.quad.GetAllNodes())
-            {
-                DrawBorder(rect, 2, Color.Red);
-            }
+            //foreach (Rectangle rect in testRoom.quad.GetAllNodes())
+            //{
+            //    DrawBorder(rect, 2, Color.Red);
+            //}
 
             spriteBatch.End();
 

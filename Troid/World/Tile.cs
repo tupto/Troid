@@ -37,17 +37,32 @@ namespace Troid.World
         }
 
         public int ID;
-        public bool Solid;
+        public TileCollision CollisionType;
 
-        public Tile(int id, bool solid = true)
+		public Tile(int id, TileCollision collisionType = TileCollision.Solid)
         {
             ID = id;
-            Solid = solid;
+			CollisionType = collisionType;
         }
 
         public void Draw(int x, int y, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(tileSheet, new Vector2(x * TILE_WIDTH, y * TILE_HEIGHT), sourceRects[ID], Color.White);
+			Color colour = Color.White;
+			if (CollisionType == TileCollision.Water)
+			{
+				colour = new Color(255, 255, 255, 100);
+			}
+
+			spriteBatch.Draw(tileSheet, new Vector2(x * TILE_WIDTH, y * TILE_HEIGHT),
+							 sourceRects[ID], colour, 0, Vector2.Zero, new Vector2(1, 1),
+							 SpriteEffects.None, 0.0f);
         }
     }
+
+	public enum TileCollision
+	{
+		None,
+		Solid,
+		Water
+	}
 }
