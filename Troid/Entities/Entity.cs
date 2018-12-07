@@ -32,7 +32,10 @@ namespace Troid.Entities
         public float GravityAcceleration = 800.0f;
         public float JumpLaunchVelocity = -900.0f;
         public float JumpControlPower = 0.2f;
+        public float KnockbackVelocity = 500.0f;
+        public float KnockbackControlPower = 0.2f;
         public float MaxJumpTime = 0.50f;
+        public float MaxKnockbackTime = 0.50f;
         public float MaxYSpeed = 500.0f;
         public float MaxXSpeed = 500.0f;
 
@@ -41,6 +44,9 @@ namespace Troid.Entities
 
         private bool wasJumping;
         private float jumpTimer;
+        private bool beingKnockedback;
+        private float knockbackTimer;
+        private Vector2 knockbackDirection;
         private bool somethingBelow;
 
         public Entity(Room room)
@@ -52,32 +58,6 @@ namespace Troid.Entities
             ApplyGravity = true;
             Alive = true;
             Direction = Direction.Right;
-        }
-
-        public void DoJump(GameTime gameTime)
-        {
-            if (Jumping)
-            {
-                if ((!wasJumping && OnGround) || jumpTimer > 0.0f)
-                {
-                    jumpTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-                }
-
-                if (jumpTimer > 0.0f && jumpTimer <= MaxJumpTime)
-                {
-                    Velocity.Y = JumpLaunchVelocity * (1.0f - (float)Math.Pow(jumpTimer / MaxJumpTime, JumpControlPower));
-                }
-                else
-                {
-                    jumpTimer = 0.0f;
-                }
-            }
-            else
-            {
-                jumpTimer = 0.0f;
-            }
-
-            wasJumping = Jumping;
         }
 
         protected void UpdateHitbox()
@@ -148,6 +128,57 @@ namespace Troid.Entities
             }
         }
 
+        public void Knockback(Vector2 direction)
+        {
+            knockbackDirection = direction;
+            knockbackDirection.Normalize();
+            knockbackTimer = 0.0f;
+            beingKnockedback = true;
+        }
+
+        private void DoKnockback(GameTime gameTime)
+        {
+            if (beingKnockedback)
+            {
+                knockbackTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+                if (knockbackTimer <= MaxKnockbackTime)
+                {
+                    Velocity = KnockbackVelocity * knockbackDirection * (1.0f - (float)Math.Pow(knockbackTimer / MaxKnockbackTime, KnockbackControlPower));
+                }
+                else
+                {
+                    beingKnockedback = false;
+                }
+            }
+        }
+
+        private void DoJump(GameTime gameTime)
+        {
+            if (Jumping)
+            {
+                if ((!wasJumping && OnGround) || jumpTimer > 0.0f)
+                {
+                    jumpTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+
+                if (jumpTimer > 0.0f && jumpTimer <= MaxJumpTime)
+                {
+                    Velocity.Y = JumpLaunchVelocity * (1.0f - (float)Math.Pow(jumpTimer / MaxJumpTime, JumpControlPower));
+                }
+                else
+                {
+                    jumpTimer = 0.0f;
+                }
+            }
+            else
+            {
+                jumpTimer = 0.0f;
+            }
+
+            wasJumping = Jumping;
+        }
+
         private bool PushOutOfTile(Rectangle tileBounds)
         {
             Vector2 collisionDept = Hitbox.GetIntersectionDepth(tileBounds);
@@ -207,6 +238,7 @@ namespace Troid.Entities
             }
 
             DoJump(gameTime);
+            DoKnockback(gameTime);
 
             Position += Velocity * elapsed;
 

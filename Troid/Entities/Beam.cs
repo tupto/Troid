@@ -73,6 +73,9 @@ namespace Troid.Entities
                 Velocity = Vector2.Zero;
                 if (CurrAnimation != "splode")
                 {
+                    Vector2 kbDir = new Vector2(entity.Hitbox.Center.X - Hitbox.Center.X, entity.Hitbox.Center.Y - Hitbox.Center.Y);
+
+                    entity.Knockback(kbDir);
                     entity.AdjustHealth(-BeamDamage);
                     CurrAnimation = "splode";
                 }
