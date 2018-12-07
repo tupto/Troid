@@ -20,14 +20,14 @@ namespace Troid.Entities
             Position = new Vector2(16, 24);
 
             Graphics.Animation spin = new Graphics.Animation(new Rectangle[] {
-                new Rectangle(0, 16, 16, 16),
-                new Rectangle(16, 16, 16, 16),
-                new Rectangle(32, 16, 16, 16),
-                new Rectangle(48, 16, 16, 16),
-                new Rectangle(64, 16, 16, 16),
-                new Rectangle(80, 16, 16, 16),
-                new Rectangle(96, 16, 16, 16),
-                new Rectangle(112, 16, 16, 16)
+                new Rectangle(0, 0, 16, 16),
+                new Rectangle(16, 0, 16, 16),
+                new Rectangle(32, 0, 16, 16),
+                new Rectangle(48, 0, 16, 16),
+                new Rectangle(64, 0, 16, 16),
+                new Rectangle(80, 0, 16, 16),
+                new Rectangle(96, 0, 16, 16),
+                new Rectangle(112, 0, 16, 16)
             });
             spin.Loop = true;
             spin.FrameTime = 0.2f;

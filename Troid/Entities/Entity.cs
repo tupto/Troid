@@ -113,10 +113,8 @@ namespace Troid.Entities
                 {
                     if (Room.TileHasCollision(x, y))
                     {
-                        hitSomething = true;
-
                         Rectangle tileBounds = Room.GetTileBouds(x, y);
-                        PushOutOfTile(tileBounds);
+                        hitSomething = PushOutOfTile(tileBounds) || hitSomething;
                         
                         if (y == worldBottom || y == worldBottom - 1)
                         {
@@ -150,7 +148,7 @@ namespace Troid.Entities
             }
         }
 
-        private void PushOutOfTile(Rectangle tileBounds)
+        private bool PushOutOfTile(Rectangle tileBounds)
         {
             Vector2 collisionDept = Hitbox.GetIntersectionDepth(tileBounds);
 
@@ -184,7 +182,9 @@ namespace Troid.Entities
                     Position = new Vector2(Position.X + collisionDept.X, Position.Y);
                     UpdateHitbox();
                 }
+                return true;
             }
+            return false;
         }
 
         public virtual void Update(GameTime gameTime)
