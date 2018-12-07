@@ -17,7 +17,7 @@ namespace Troid.World
         public Tile[,] Tiles;
         public List<Entity> Entities;
 
-        private Quadtree quad;
+        public Quadtree quad;
 
         public Room(int width, int height)
         {

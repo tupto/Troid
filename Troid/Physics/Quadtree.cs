@@ -26,6 +26,19 @@ namespace Troid.Physics
             nodes = new Quadtree[4];
         }
 
+        public List<Rectangle> GetAllNodes()
+        {
+            List<Rectangle> tempNodes = new List<Rectangle>();
+            tempNodes.Add(bounds);
+
+            foreach (Quadtree node in nodes)
+            {
+                tempNodes.AddRange(node.GetAllNodes());
+            }
+
+            return tempNodes;
+        }
+
         public void Clear()
         {
             objects.Clear();
