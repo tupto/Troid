@@ -103,7 +103,10 @@ namespace Troid
 
             testRoom.Draw(spriteBatch);
 
-            foreach (Entity rect in testRoom.quad.Retreive())
+            foreach (Rectangle rect in testRoom.quad.GetAllNodes())
+            {
+                DrawBorder(rect, 2, Color.Red);
+            }
 
             spriteBatch.End();
 
