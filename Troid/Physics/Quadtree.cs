@@ -10,7 +10,7 @@ namespace Troid.Physics
 {
     public class Quadtree
     {
-        private const int MAX_OBJECTS = 5;
+        private const int MAX_OBJECTS = 1;
         private const int MAX_LEVELS = 5;
 
         private int level;
@@ -33,7 +33,8 @@ namespace Troid.Physics
 
             foreach (Quadtree node in nodes)
             {
-                tempNodes.AddRange(node.GetAllNodes());
+                if (node != null)
+                    tempNodes.AddRange(node.GetAllNodes());
             }
 
             return tempNodes;
