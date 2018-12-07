@@ -41,7 +41,7 @@ namespace Troid.Entities
             }));
 
             CurrAnimation = "idle";
-            Position = new Vector2(20, 100);
+            Position = new Vector2(140, 72);
             shootOffset = new Vector2(16, 8);
         }
 

@@ -35,6 +35,8 @@ namespace Troid.Entities
             Animations.Add("spin", spin);
 
             CurrAnimation = "spin";
+
+            ContactDamage = 20;
         }
 
         public override void OnEntityHit(Entity entity)
@@ -42,6 +44,7 @@ namespace Troid.Entities
             if (entity is Player)
             {
                 entity.AdjustHealth(-ContactDamage);
+                entity.Knockback(new Vector2(entity.Hitbox.Center.X - Hitbox.Center.X, entity.Hitbox.Center.Y - Hitbox.Center.Y));
             }
         }
     }
