@@ -13,11 +13,14 @@ namespace Troid.Entities
     {
         public static Texture2D BeamTex;
 
+        public int BeamDamage;
+
         public Beam(Room room, Vector2 position, Direction direction) : base(room)
         {
             Position = position;
             Direction = direction;
             MoveAcceleration = 200;
+            BeamDamage = 10;
             if (direction == Direction.Right)
             {
                 Velocity = new Vector2(MoveAcceleration, 0);
@@ -63,8 +66,25 @@ namespace Troid.Entities
             base.Update(gameTime);
         }
 
+        public override void OnEntityHit(Entity entity)
+        {
+            if (entity is Enemy)
+            {
+                Velocity = Vector2.Zero;
+                if (CurrAnimation != "splode")
+                {
+                    Vector2 kbDir = new Vector2(entity.Hitbox.Center.X - Hitbox.Center.X, entity.Hitbox.Center.Y - Hitbox.Center.Y);
+
+                    entity.Knockback(kbDir);
+                    entity.AdjustHealth(-BeamDamage);
+                    CurrAnimation = "splode";
+                }
+            }
+        }
+
         public override void OnWallHit()
         {
+            Velocity = Vector2.Zero;
             if (CurrAnimation != "splode")
                 CurrAnimation = "splode";
         }

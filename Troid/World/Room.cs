@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Troid.Entities;
+using Troid.Physics;
 
 namespace Troid.World
 {
@@ -16,12 +17,16 @@ namespace Troid.World
         public Tile[,] Tiles;
         public List<Entity> Entities;
 
+        public Quadtree quad;
+
         public Room(int width, int height)
         {
             Width = width;
             Height = height;
             Tiles = new Tile[width, height];
             Entities = new List<Entity>();
+
+            quad = new Quadtree(0, new Rectangle(0, 0, width * Tile.TILE_WIDTH, height * Tile.TILE_HEIGHT));
 
             for (int x = 0; x < width; x++)
             {
@@ -55,9 +60,28 @@ namespace Troid.World
 
         public void Update(GameTime gameTime)
         {
+            quad.Clear();
+
+            for (int i = Entities.Count - 1; i >= 0; i--)
+            {
+                quad.Insert(Entities[i]);
+            }
+
+            List<Entity> objects = new List<Entity>();
             for (int i = Entities.Count - 1; i >= 0; i--)
             {
                 Entities[i].Update(gameTime);
+
+                objects.Clear();
+                objects = quad.Retreive(objects, Entities[i]);
+
+                for (int j = 0; j < objects.Count; j++)
+                {
+                    if (Entities[i] != objects[j] && Entities[i].Hitbox.Intersects(objects[j].Hitbox))
+                    {
+                        Entities[i].OnEntityHit(objects[j]);
+                    }
+                }
 
                 if (!Entities[i].Alive)
                 {
