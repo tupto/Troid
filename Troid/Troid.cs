@@ -15,7 +15,9 @@ namespace Troid
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        World.World world;
         Room testRoom;
+        Room secondRoom;
         Player player;
         Enemy spinner;
         Camera camera;
@@ -40,14 +42,21 @@ namespace Troid
             graphics.PreferredBackBufferHeight = 160 * 2;
             graphics.ApplyChanges();
 
-            testRoom = new Room(60, 40);
-            player = new Player(testRoom);
-            spinner = new Enemy(testRoom);
+            world = new World.World();
+
+            testRoom = new Room(world, 60, 40);
+            secondRoom = new Room(world, 30, 20);
+            
+            world.AddRoom(testRoom);
+            world.AddRoom(secondRoom);
+
+            player = new Player(world);
+            spinner = new Enemy(world);
 
             testRoom.AddEntity(player);
             testRoom.AddEntity(spinner);
 
-            camera = new Camera(testRoom, GraphicsDevice.Viewport);
+            camera = new Camera(world, GraphicsDevice.Viewport);
 
             base.Initialize();
         }
@@ -89,7 +98,7 @@ namespace Troid
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             
-            testRoom.Update(gameTime);
+            world.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -104,7 +113,7 @@ namespace Troid
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.GetTransform());
 
-            testRoom.Draw(spriteBatch);
+            world.Draw(spriteBatch);
 
             //foreach (Rectangle rect in testRoom.quad.GetAllNodes())
             //{

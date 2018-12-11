@@ -22,7 +22,7 @@ namespace Troid.Entities
         public bool Jumping;
         public bool ApplyGravity;
         public bool OnGround;
-        public Room Room;
+        public World.World World;
         public Direction Direction;
         public bool Alive;
 
@@ -49,9 +49,9 @@ namespace Troid.Entities
         private Vector2 knockbackDirection;
         private bool somethingBelow;
 
-        public Entity(Room room)
+        public Entity(World.World world)
         {
-            Room = room;
+            World = world;
             Animations = new Dictionary<string, Animation>();
             Position = Vector2.Zero;
             Velocity = Vector2.Zero;
@@ -91,9 +91,9 @@ namespace Troid.Entities
             {
                 for (int y = worldTop; y <= worldBottom; y++)
                 {
-                    if (Room.TileHasCollision(x, y))
+                    if (World.CurrentRoom.TileHasCollision(x, y))
                     {
-                        Rectangle tileBounds = Room.GetTileBouds(x, y);
+                        Rectangle tileBounds = World.CurrentRoom.GetTileBouds(x, y);
                         hitSomething = PushOutOfTile(tileBounds) || hitSomething;
                         
                         if (y == worldBottom || y == worldBottom - 1)

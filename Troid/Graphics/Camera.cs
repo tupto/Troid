@@ -14,13 +14,13 @@ namespace Troid.Graphics
     {
         public float Zoom;
 
-        private Room room;
+        private World.World world;
         private Vector2 position;
         private Rectangle screenBounds;
 
-        public Camera(Room room, Viewport viewport)
+        public Camera(World.World world, Viewport viewport)
         {
-            this.room = room;
+            this.world = world;
             this.screenBounds = viewport.Bounds;
             position = Vector2.Zero;
             Zoom = 2.0f;
@@ -28,13 +28,13 @@ namespace Troid.Graphics
 
         public Matrix GetTransform()
         {
-            Player player = room.GetPlayer();
+            Player player = world.CurrentRoom.GetPlayer();
 
             if (player != null)
             {
                 position = player.Position;
-                position.X = MathHelper.Clamp(position.X, screenBounds.Width / Zoom * 0.5f, room.PixelWidth - (screenBounds.Width / Zoom * 0.5f));
-                position.Y = MathHelper.Clamp(position.Y, screenBounds.Height / Zoom * 0.5f, room.PixelHeight - (screenBounds.Height / Zoom * 0.5f));
+                position.X = MathHelper.Clamp(position.X, screenBounds.Width / Zoom * 0.5f, world.CurrentRoom.PixelWidth - (screenBounds.Width / Zoom * 0.5f));
+                position.Y = MathHelper.Clamp(position.Y, screenBounds.Height / Zoom * 0.5f, world.CurrentRoom.PixelHeight - (screenBounds.Height / Zoom * 0.5f));
             }
 
             return Matrix.CreateTranslation(new Vector3(-position.X, -position.Y, 0.0f)) *

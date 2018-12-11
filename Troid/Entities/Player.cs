@@ -15,8 +15,8 @@ namespace Troid.Entities
         private float shootTimerMax;
         private Vector2 shootOffset;
 
-        public Player(Room room)
-            : base(room)
+        public Player(World.World world)
+            : base(world)
         {
             shootTimer = 0.0f;
             shootTimerMax = 0.3f;
@@ -85,8 +85,8 @@ namespace Troid.Entities
                     shootPos += new Vector2(0, 8);
                 }
 
-                Beam beam = new Beam(Room, shootPos, Direction);
-                Room.AddEntity(beam);
+                Beam beam = new Beam(World, shootPos, Direction);
+                World.CurrentRoom.AddEntity(beam);
             }
 
             Jumping = ks.IsKeyDown(Keys.Space);
