@@ -46,6 +46,7 @@
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\Player.cs" />
     <Compile Include="Graphics\Animation.cs" />
+    <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Physics\Quadtree.cs" />
     <Compile Include="Troid.cs" />
     <Compile Include="Program.cs" />

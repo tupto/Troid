@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Troid.Entities;
+using Troid.Graphics;
 using Troid.World;
 
 namespace Troid
@@ -17,9 +18,9 @@ namespace Troid
         Room testRoom;
         Player player;
         Enemy spinner;
+        Camera camera;
 
         Texture2D pixel;
-        
 
         public Troid()
         {
@@ -35,16 +36,18 @@ namespace Troid
         /// </summary>
         protected override void Initialize()
         {
-            graphics.PreferredBackBufferWidth = 240;
-            graphics.PreferredBackBufferHeight = 160;
+            graphics.PreferredBackBufferWidth = 240 * 2;
+            graphics.PreferredBackBufferHeight = 160 * 2;
             graphics.ApplyChanges();
 
-            testRoom = new Room(30, 20);
+            testRoom = new Room(60, 40);
             player = new Player(testRoom);
             spinner = new Enemy(testRoom);
 
-            testRoom.Entities.Add(player);
-            testRoom.Entities.Add(spinner);
+            testRoom.AddEntity(player);
+            testRoom.AddEntity(spinner);
+
+            camera = new Camera(testRoom, GraphicsDevice.Viewport);
 
             base.Initialize();
         }
@@ -99,14 +102,19 @@ namespace Troid
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.GetTransform());
 
             testRoom.Draw(spriteBatch);
 
-            foreach (Rectangle rect in testRoom.quad.GetAllNodes())
-            {
-                DrawBorder(rect, 2, Color.Red);
-            }
+            //foreach (Rectangle rect in testRoom.quad.GetAllNodes())
+            //{
+            //    DrawBorder(rect, 2, Color.Red);
+            //}
+
+            //foreach (Entity entity in testRoom.GetEntities())
+            //{
+            //    DrawBorder(entity.Hitbox, 1, Color.Red);
+            //}
 
             spriteBatch.End();
 

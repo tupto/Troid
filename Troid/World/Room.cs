@@ -15,16 +15,29 @@ namespace Troid.World
         public int Width;
         public int Height;
         public Tile[,] Tiles;
-        public List<Entity> Entities;
 
         public Quadtree quad;
+
+        public int PixelWidth
+        {
+            get { return Width * Tile.TILE_WIDTH; }
+        }
+
+        public int PixelHeight
+        {
+            get { return Height * Tile.TILE_HEIGHT; }
+        }
+
+        private List<Entity> entities;
+        private int playerIndex;
 
         public Room(int width, int height)
         {
             Width = width;
             Height = height;
             Tiles = new Tile[width, height];
-            Entities = new List<Entity>();
+            entities = new List<Entity>();
+            playerIndex = -1;
 
             quad = new Quadtree(0, new Rectangle(0, 0, width * Tile.TILE_WIDTH, height * Tile.TILE_HEIGHT));
 
@@ -32,12 +45,35 @@ namespace Troid.World
             {
                 for (int y = 0; y < height; y++)
                 {
-                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1 || (x > width / 2 && y > height / 2))
+                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1 || (x > width / 4 && y > height / 4))
                     {
                         Tiles[x, y] = new Tile((x + y) % 2);
                     }
                 }
             }
+        }
+
+        public void AddEntity(Entity entity)
+        {
+            entities.Add(entity);
+
+            if (entity is Player)
+                playerIndex = entities.Count - 1;
+        }
+
+        public List<Entity> GetEntities()
+        {
+            return entities;
+        }
+
+        public Player GetPlayer()
+        {
+            if (playerIndex != -1)
+            {
+                return (Player)entities[playerIndex];
+            }
+
+            return null;
         }
 
         public bool TileHasCollision(int x, int y)
@@ -62,32 +98,35 @@ namespace Troid.World
         {
             quad.Clear();
 
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = entities.Count - 1; i >= 0; i--)
             {
-                quad.Insert(Entities[i]);
+                quad.Insert(entities[i]);
             }
 
             List<Entity> objects = new List<Entity>();
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = entities.Count - 1; i >= 0; i--)
             {
-                Entities[i].Update(gameTime);
+                entities[i].Update(gameTime);
 
                 objects.Clear();
-                objects = quad.Retreive(objects, Entities[i]);
+                objects = quad.Retreive(objects, entities[i]);
 
                 for (int j = 0; j < objects.Count; j++)
                 {
-                    if (Entities[i] != objects[j] && Entities[i].Hitbox.Intersects(objects[j].Hitbox))
+                    if (entities[i] != objects[j] && entities[i].Hitbox.Intersects(objects[j].Hitbox))
                     {
-                        Entities[i].OnEntityHit(objects[j]);
+                        entities[i].OnEntityHit(objects[j]);
                     }
                 }
 
-                if (!Entities[i].Alive)
+                if (!entities[i].Alive)
                 {
-                    Entities[i].OnDeath();
-                    Entities[i] = null;
-                    Entities.RemoveAt(i);
+                    if (entities[i] is Player)
+                        playerIndex = -1;
+
+                    entities[i].OnDeath();
+                    entities[i] = null;
+                    entities.RemoveAt(i);
                 }
             }
         }
@@ -103,9 +142,9 @@ namespace Troid.World
                 }
             }
 
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = entities.Count - 1; i >= 0; i--)
             {
-                Entities[i].Draw(spriteBatch);
+                entities[i].Draw(spriteBatch);
             }
         }
     }

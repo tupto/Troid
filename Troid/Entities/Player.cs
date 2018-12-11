@@ -86,7 +86,7 @@ namespace Troid.Entities
                 }
 
                 Beam beam = new Beam(Room, shootPos, Direction);
-                Room.Entities.Add(beam);
+                Room.AddEntity(beam);
             }
 
             Jumping = ks.IsKeyDown(Keys.Space);
