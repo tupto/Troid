@@ -42,20 +42,28 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Entities\Beam.cs" />
+    <Compile Include="Entities\Door.cs" />
     <Compile Include="Entities\Enemy.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\TriggerEntity.cs" />
     <Compile Include="Graphics\Animation.cs" />
+    <Compile Include="Graphics\Camera.cs" />
     <Compile Include="Physics\Quadtree.cs" />
     <Compile Include="Troid.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\ContentReaders\RoomContentReader.cs" />
     <Compile Include="Utils\PhysicsUtils.cs" />
     <Compile Include="World\Room.cs" />
     <Compile Include="World\Tile.cs" />
+    <Compile Include="World\World.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="MonoGame.Framework">
       <HintPath>..\..\..\..\..\usr\lib\mono\xbuild\MonoGame\v3.0\Assemblies\DesktopGL\MonoGame.Framework.dll</HintPath>

@@ -15,88 +15,89 @@ namespace Troid.World
         public int Width;
         public int Height;
         public Tile[,] Tiles;
-        public List<Entity> Entities;
 
         public Quadtree quad;
+
+        public int PixelWidth
+        {
+            get { return Width * Tile.TILE_WIDTH; }
+        }
+
+        public int PixelHeight
+        {
+            get { return Height * Tile.TILE_HEIGHT; }
+        }
+
+        private List<Entity> entities;
+        private int playerIndex;
+        private World world;
 
         public Room(int width, int height)
         {
             Width = width;
             Height = height;
             Tiles = new Tile[width, height];
-            Entities = new List<Entity>();
+            entities = new List<Entity>();
+            playerIndex = -1;
 
             quad = new Quadtree(0, new Rectangle(0, 0, width * Tile.TILE_WIDTH, height * Tile.TILE_HEIGHT));
-
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1 || y > height / 2)
-                    {
-						Tiles[x, y] = new Tile(0);
-                    }
-                }
-            }
-
-			for (int x = 0; x < width; x++)
-			{
-				for (int y = 0; y < height; y++)
-				{
-					if (Tiles[x, y] == null)
-						continue;
-
-					if (x == 0)
-					{
-						if (y == 0 || y == height - 1)
-						{
-							Tiles[x, y] = new Tile(5);
-						}
-						else
-						{
-							Tiles[x, y] = new Tile(4);
-						}
-					}
-					else if (y == 0)
-					{
-						Tiles[x, y] = new Tile(2);
-					}
-					else if (x == width - 1 && !(x > width / 2 && y > height / 2))
-					{
-						Tiles[x, y] = new Tile(3);
-					}
-					else if (y == height - 1 && !(x > width / 2 && y > height / 2))
-					{
-						Tiles[x, y] = new Tile(2);
-					}
-					else if (x - 1 == width / 2)
-					{
-						if (y - 1 == height / 2)
-						{
-							Tiles[x, y] = new Tile(0);
-						}
-						else
-						{
-							Tiles[x, y] = new Tile(3);
-						}
-					}
-					else if (y - 1 == height / 2 && x - 1 > width / 2)
-					{
-						Tiles[x, y] = new Tile(2);
-					}
-					else if (y > height / 2 && x -1 < width / 2)
-					{
-						Tiles[x, y] = new Tile(8, TileCollision.Water);
-					}
-					else
-					{
-						Tiles[x, y] = new Tile(5);
-					}
-				}
-			}
+            
+            Door door = new Door(world, new Vector2(0, (height - 3) * Tile.TILE_HEIGHT));
+            door.ConnectingRoomId = (width / 30) - 1;
+            AddEntity(door);
         }
 
-        public TileCollision GetTileCollision(int x, int y)
+        public void SetTiles(int[] tileData)
+        {
+            if (Width * Height != tileData.Length)
+                throw new ArgumentException("Data length must equal height * width");
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    if (tileData[x + y * Width] == -1)
+                        continue;
+
+                    Tiles[x, y] = new Tile(tileData[x + y * Width]);
+                }
+            }
+        }
+
+        public int GetTileID(int x, int y)
+        {
+            return Tiles[x, y].ID;
+        }
+
+        public void AddEntity(Entity entity)
+        {
+            entities.Add(entity);
+
+            if (entity is Player)
+                playerIndex = entities.Count - 1;
+        }
+
+        public void RemoveEntity(Entity entity)
+        {
+            entities.Remove(entity);
+        }
+
+        public List<Entity> GetEntities()
+        {
+            return entities;
+        }
+
+        public Player GetPlayer()
+        {
+            if (playerIndex != -1)
+            {
+                return (Player)entities[playerIndex];
+            }
+
+            return null;
+        }
+
+		public TileCollision GetTileCollision(int x, int y)
         {
             if (Tiles.Length <= x + y * Width || x + y * Width < 0 || x < 0 || y < 0 || x >= Width || y >= Height)
 				return TileCollision.None;
@@ -118,32 +119,35 @@ namespace Troid.World
         {
             quad.Clear();
 
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = entities.Count - 1; i >= 0; i--)
             {
-                quad.Insert(Entities[i]);
+                quad.Insert(entities[i]);
             }
 
             List<Entity> objects = new List<Entity>();
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = entities.Count - 1; i >= 0; i--)
             {
-                Entities[i].Update(gameTime);
+                entities[i].Update(gameTime);
 
                 objects.Clear();
-                objects = quad.Retreive(objects, Entities[i]);
+                objects = quad.Retreive(objects, entities[i]);
 
                 for (int j = 0; j < objects.Count; j++)
                 {
-                    if (Entities[i] != objects[j] && Entities[i].Hitbox.Intersects(objects[j].Hitbox))
+                    if (entities[i] != objects[j] && entities[i].Hitbox.Intersects(objects[j].Hitbox))
                     {
-                        Entities[i].OnEntityHit(objects[j]);
+                        entities[i].OnEntityHit(objects[j]);
                     }
                 }
 
-                if (!Entities[i].Alive)
+                if (!entities[i].Alive)
                 {
-                    Entities[i].OnDeath();
-                    Entities[i] = null;
-                    Entities.RemoveAt(i);
+                    if (entities[i] is Player)
+                        playerIndex = -1;
+
+                    entities[i].OnDeath();
+                    entities[i] = null;
+                    entities.RemoveAt(i);
                 }
             }
         }
@@ -173,9 +177,9 @@ namespace Troid.World
                 }
             }
 
-            for (int i = Entities.Count - 1; i >= 0; i--)
+            for (int i = entities.Count - 1; i >= 0; i--)
             {
-                Entities[i].Draw(spriteBatch);
+                entities[i].Draw(spriteBatch);
             }
 
 			for (int i = 0; i < waterTiles.Count; i++)

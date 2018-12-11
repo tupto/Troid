@@ -15,7 +15,7 @@ namespace Troid.Entities
 
         public int ContactDamage;
 
-        public Enemy(Room room) : base(room)
+        public Enemy(World.World world) : base(world)
         {
             Position = new Vector2(16, 24);
 

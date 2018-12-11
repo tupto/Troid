@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Troid.Entities;
+using Troid.Graphics;
 using Troid.World;
 
 namespace Troid
@@ -14,12 +15,14 @@ namespace Troid
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        World.World world;
         Room testRoom;
+        Room secondRoom;
         Player player;
         Enemy spinner;
+        Camera camera;
 
         Texture2D pixel;
-        
 
         public Troid()
         {
@@ -35,16 +38,16 @@ namespace Troid
         /// </summary>
         protected override void Initialize()
         {
-            graphics.PreferredBackBufferWidth = 240 * 4;
-            graphics.PreferredBackBufferHeight = 160 * 4;
+            graphics.PreferredBackBufferWidth = 240 * 2;
+            graphics.PreferredBackBufferHeight = 160 * 2;
             graphics.ApplyChanges();
 
-            testRoom = new Room(30, 20);
-            player = new Player(testRoom);
-            spinner = new Enemy(testRoom);
+            world = new World.World();
 
-            testRoom.Entities.Add(player);
-            testRoom.Entities.Add(spinner);
+            player = new Player(world);
+            spinner = new Enemy(world);
+
+            camera = new Camera(world, GraphicsDevice.Viewport);
 
             base.Initialize();
         }
@@ -62,6 +65,13 @@ namespace Troid
             spinner.SpriteSheet = Content.Load<Texture2D>("spin");
             Tile.TileSheet = Content.Load<Texture2D>("tiles");
             Beam.BeamTex = Content.Load<Texture2D>("beam");
+
+            testRoom = Content.Load<Room>("room1");
+
+            testRoom.AddEntity(player);
+            testRoom.AddEntity(spinner);
+
+            world.AddRoom(testRoom);
 
             pixel = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixel.SetData(new[] { Color.White });
@@ -86,7 +96,7 @@ namespace Troid
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             
-            testRoom.Update(gameTime);
+            world.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -99,13 +109,18 @@ namespace Troid
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-			spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, Matrix.CreateScale(4));
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.GetTransform());
 
-            testRoom.Draw(spriteBatch);
+            world.Draw(spriteBatch);
 
             //foreach (Rectangle rect in testRoom.quad.GetAllNodes())
             //{
             //    DrawBorder(rect, 2, Color.Red);
+            //}
+
+            //foreach (Entity entity in testRoom.GetEntities())
+            //{
+            //    DrawBorder(entity.Hitbox, 1, Color.Red);
             //}
 
             spriteBatch.End();

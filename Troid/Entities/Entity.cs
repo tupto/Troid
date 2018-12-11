@@ -23,13 +23,13 @@ namespace Troid.Entities
         public bool ApplyGravity;
         public bool OnGround;
 		public bool InWater;
-        public Room Room;
+        public World.World World;
         public Direction Direction;
         public bool Alive;
 
         public int Health = 100;
         public int MaxHealth = 100;
-        public float MoveAcceleration = 2000.0f;
+        public float MoveAcceleration = 4000.0f;
         public float GravityAcceleration = 800.0f;
         public float JumpLaunchVelocity = -900.0f;
         public float JumpControlPower = 0.2f;
@@ -39,8 +39,8 @@ namespace Troid.Entities
         public float MaxJumpTime = 0.50f;
         public float MaxKnockbackTime = 0.50f;
 		public float DrownTime = 5.0f;
-        public float MaxYSpeed = 500.0f;
-        public float MaxXSpeed = 500.0f;
+        public float MaxYSpeed = 200.0f;
+        public float MaxXSpeed = 1000.0f;
 
         private int previousBottom;
 
@@ -53,9 +53,9 @@ namespace Troid.Entities
         private Vector2 knockbackDirection;
         private bool somethingBelow;
 
-        public Entity(Room room)
+        public Entity(World.World world)
         {
-            Room = room;
+            World = world;
             Animations = new Dictionary<string, Animation>();
             Position = Vector2.Zero;
             Velocity = Vector2.Zero;
@@ -96,11 +96,11 @@ namespace Troid.Entities
             {
                 for (int y = worldTop; y <= worldBottom; y++)
                 {
-					TileCollision colType = Room.GetTileCollision(x, y);
+					TileCollision colType = World.CurrentRoom.GetTileCollision(x, y);
 
 					if (colType == TileCollision.Solid)
 					{
-						Rectangle tileBounds = Room.GetTileBouds(x, y);
+						Rectangle tileBounds = World.CurrentRoom.GetTileBouds(x, y);
 						hitSomething = PushOutOfTile(tileBounds) || hitSomething;
 
 						if (y == worldBottom || y == worldBottom - 1)
@@ -110,7 +110,7 @@ namespace Troid.Entities
 					}
 					else if (colType == TileCollision.Water)
 					{
-						InWater = InWater || Hitbox.Intersects(Room.GetTileBouds(x, y));
+						InWater = InWater || Hitbox.Intersects(World.CurrentRoom.GetTileBouds(x, y));
 					}
                 }
             }
@@ -168,7 +168,7 @@ namespace Troid.Entities
         {
             if (Jumping)
             {
-				if ((!wasJumping && (OnGround || InWater)) || jumpTimer > 0.0f)
+				if ((!wasJumping && (OnGround || InWater || Velocity.Y == MaxYSpeed)) || jumpTimer > 0.0f)
                 {
                     jumpTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }

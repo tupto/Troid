@@ -10,6 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
+/reference:..\TroidContentPipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -72,4 +73,9 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:spin.png
+
+#begin Rooms/room.room
+/importer:RoomContentImporter
+/processor:RoomContentProcessor
+/build:Rooms/room.room
 
