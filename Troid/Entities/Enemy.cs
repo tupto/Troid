@@ -23,21 +23,47 @@ namespace Troid.Entities
                 new Rectangle(0, 0, 16, 16),
                 new Rectangle(16, 0, 16, 16),
                 new Rectangle(32, 0, 16, 16),
-                new Rectangle(48, 0, 16, 16),
-                new Rectangle(64, 0, 16, 16),
-                new Rectangle(80, 0, 16, 16),
-                new Rectangle(96, 0, 16, 16),
-                new Rectangle(112, 0, 16, 16)
+                new Rectangle(48, 0, 16, 16)
             });
             spin.Loop = true;
             spin.FrameTime = 0.2f;
 
-            Animations.Add("spin", spin);
+            Animations.Add("float", spin);
 
-            CurrAnimation = "spin";
+            CurrAnimation = "float";
 
-            ContactDamage = 20;
+            ContactDamage = 0;
+
+			ApplyGravity = false;
         }
+
+		public override void Update(GameTime gameTime)
+		{
+			Player player = Room.GetPlayer();
+
+			if (player != null)
+			{
+				Vector2 playerDir = player.Position - Position;
+				playerDir.Normalize();
+
+				Velocity = playerDir * MoveAcceleration * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+				if (Velocity.X > 0)
+				{
+					Direction = Direction.Right;
+				}
+				else
+				{
+					Direction = Direction.Left;
+				}
+			}
+			else
+			{
+				Velocity = Vector2.Zero;
+			}
+
+			base.Update(gameTime);
+		}
 
         public override void OnEntityHit(Entity entity)
         {
@@ -47,5 +73,12 @@ namespace Troid.Entities
                 entity.Knockback(new Vector2(entity.Hitbox.Center.X - Hitbox.Center.X, entity.Hitbox.Center.Y - Hitbox.Center.Y));
             }
         }
+
+		public override void OnDeath()
+		{
+			Enemy newE = new Enemy(Room);
+			newE.SpriteSheet = this.SpriteSheet;
+			Room.Entities.Add(newE);
+		}
     }
 }

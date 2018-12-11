@@ -17,6 +17,7 @@ namespace Troid.World
         public Tile[,] Tiles;
         public List<Entity> Entities;
 
+		private int playerIndex = 0;
         public Quadtree quad;
 
         public Room(int width, int height)
@@ -95,6 +96,14 @@ namespace Troid.World
 				}
 			}
         }
+
+		public Player GetPlayer()
+		{
+			if (Entities[playerIndex] is Player)
+				return (Player)Entities[playerIndex];
+
+			return null;
+		}
 
         public TileCollision GetTileCollision(int x, int y)
         {

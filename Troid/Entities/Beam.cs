@@ -21,6 +21,7 @@ namespace Troid.Entities
             Direction = direction;
             MoveAcceleration = 200;
             BeamDamage = 10;
+			WaterSpeedModifier = 1.0f;
             if (direction == Direction.Right)
             {
                 Velocity = new Vector2(MoveAcceleration, 0);

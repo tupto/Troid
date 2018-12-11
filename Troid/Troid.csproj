@@ -53,6 +53,7 @@
     <Compile Include="Utils\PhysicsUtils.cs" />
     <Compile Include="World\Room.cs" />
     <Compile Include="World\Tile.cs" />
+    <Compile Include="Entities\Particle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
