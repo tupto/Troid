@@ -28,7 +28,7 @@ namespace Troid.Entities
 
         public int Health = 100;
         public int MaxHealth = 100;
-        public float MoveAcceleration = 2000.0f;
+        public float MoveAcceleration = 4000.0f;
         public float GravityAcceleration = 800.0f;
         public float JumpLaunchVelocity = -900.0f;
         public float JumpControlPower = 0.2f;
@@ -36,8 +36,8 @@ namespace Troid.Entities
         public float KnockbackControlPower = 0.2f;
         public float MaxJumpTime = 0.50f;
         public float MaxKnockbackTime = 0.50f;
-        public float MaxYSpeed = 500.0f;
-        public float MaxXSpeed = 500.0f;
+        public float MaxYSpeed = 200.0f;
+        public float MaxXSpeed = 1000.0f;
 
         private int previousBottom;
         private Vector2 previousPosition;
@@ -157,7 +157,7 @@ namespace Troid.Entities
         {
             if (Jumping)
             {
-                if ((!wasJumping && OnGround) || jumpTimer > 0.0f)
+                if ((!wasJumping && (OnGround || Velocity.Y == MaxYSpeed)) || jumpTimer > 0.0f)
                 {
                     jumpTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                 }
