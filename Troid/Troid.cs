@@ -44,17 +44,8 @@ namespace Troid
 
             world = new World.World();
 
-            testRoom = new Room(world, 60, 40);
-            secondRoom = new Room(world, 30, 20);
-            
-            world.AddRoom(testRoom);
-            world.AddRoom(secondRoom);
-
             player = new Player(world);
             spinner = new Enemy(world);
-
-            testRoom.AddEntity(player);
-            testRoom.AddEntity(spinner);
 
             camera = new Camera(world, GraphicsDevice.Viewport);
 
@@ -74,6 +65,13 @@ namespace Troid
             spinner.SpriteSheet = Content.Load<Texture2D>("spin");
             Tile.TileSheet = Content.Load<Texture2D>("tiles");
             Beam.BeamTex = Content.Load<Texture2D>("beam");
+
+            testRoom = Content.Load<Room>("room1");
+
+            testRoom.AddEntity(player);
+            testRoom.AddEntity(spinner);
+
+            world.AddRoom(testRoom);
 
             pixel = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixel.SetData(new[] { Color.White });

@@ -32,7 +32,7 @@ namespace Troid.World
         private int playerIndex;
         private World world;
 
-        public Room(World world, int width, int height)
+        public Room(int width, int height)
         {
             Width = width;
             Height = height;
@@ -41,24 +41,32 @@ namespace Troid.World
             playerIndex = -1;
 
             quad = new Quadtree(0, new Rectangle(0, 0, width * Tile.TILE_WIDTH, height * Tile.TILE_HEIGHT));
-
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
-                {
-                    if (x == 0 || y == 0 || x == width - 1 || y == height - 1 || (x > width / 4 && y > height / 4))
-                    {
-                        if (x == 0 && (y == height - 2 || y == height - 3))
-                            continue;
-
-                        Tiles[x, y] = new Tile((x + y) % 2);
-                    }
-                }
-            }
-
+            
             Door door = new Door(world, new Vector2(0, (height - 3) * Tile.TILE_HEIGHT));
             door.ConnectingRoomId = (width / 30) - 1;
             AddEntity(door);
+        }
+
+        public void SetTiles(int[] tileData)
+        {
+            if (Width * Height != tileData.Length)
+                throw new ArgumentException("Data length must equal height * width");
+
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    if (tileData[x + y * Width] == -1)
+                        continue;
+
+                    Tiles[x, y] = new Tile(tileData[x + y * Width]);
+                }
+            }
+        }
+
+        public int GetTileID(int x, int y)
+        {
+            return Tiles[x, y].ID;
         }
 
         public void AddEntity(Entity entity)
