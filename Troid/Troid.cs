@@ -19,8 +19,8 @@ namespace Troid
         Room testRoom;
         Room secondRoom;
         Player player;
-        Enemy spinner;
         Camera camera;
+        Enemy evilbrain;
 
         Texture2D pixel;
 
@@ -44,10 +44,10 @@ namespace Troid
 
             world = new World.World();
 
-            player = new Player(world);
-            spinner = new Enemy(world);
-
             camera = new Camera(world, GraphicsDevice.Viewport);
+
+			testRoom.AddEntity(player);
+			testRoom.AddEntity(evilbrain);
 
             base.Initialize();
         }
@@ -62,14 +62,14 @@ namespace Troid
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             player.SpriteSheet = Content.Load<Texture2D>("charsprites");
-            spinner.SpriteSheet = Content.Load<Texture2D>("spin");
+			evilbrain.SpriteSheet = Content.Load<Texture2D>("evilbrain");
             Tile.TileSheet = Content.Load<Texture2D>("tiles");
             Beam.BeamTex = Content.Load<Texture2D>("beam");
 
             testRoom = Content.Load<Room>("room1");
 
             testRoom.AddEntity(player);
-            testRoom.AddEntity(spinner);
+			testRoom.AddEntity(evilbrain);
 
             world.AddRoom(testRoom);
 
@@ -107,7 +107,7 @@ namespace Troid
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+			GraphicsDevice.Clear(Color.DarkBlue);
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null, camera.GetTransform());
 

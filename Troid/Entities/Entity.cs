@@ -304,7 +304,9 @@ namespace Troid.Entities
 			                 Color.White, 0, Vector2.Zero, new Vector2(1, 1), effects, 0.0f);
         }
 
-        public virtual void OnWallHit() { }
+        public virtual void OnWallHit()
+		{
+		}
         public virtual void OnEntityHit(Entity entity) { }
         public virtual void OnDeath() { }
     }

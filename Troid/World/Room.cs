@@ -87,17 +87,15 @@ namespace Troid.World
             return entities;
         }
 
-        public Player GetPlayer()
-        {
-            if (playerIndex != -1)
-            {
-                return (Player)entities[playerIndex];
-            }
+		public Player GetPlayer()
+		{
+			if (entities[playerIndex] is Player)
+				return (Player)entities[playerIndex];
 
-            return null;
-        }
+			return null;
+		}
 
-		public TileCollision GetTileCollision(int x, int y)
+        public TileCollision GetTileCollision(int x, int y)
         {
             if (Tiles.Length <= x + y * Width || x + y * Width < 0 || x < 0 || y < 0 || x >= Width || y >= Height)
 				return TileCollision.None;

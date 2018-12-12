@@ -74,8 +74,22 @@
 /processorParam:TextureFormat=Color
 /build:spin.png
 
+<<<<<<< HEAD
 #begin Rooms/room.room
 /importer:RoomContentImporter
 /processor:RoomContentProcessor
 /build:Rooms/room.room
+=======
+#begin evilbrain.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:evilbrain.png
+>>>>>>> water-and-stuff
 

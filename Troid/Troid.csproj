@@ -58,6 +58,7 @@
     <Compile Include="World\Room.cs" />
     <Compile Include="World\Tile.cs" />
     <Compile Include="World\World.cs" />
+    <Compile Include="Entities\Particle.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
