@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Troid.World;
+using TroidEngine.World;
+using TroidEngine.Entities;
+using TroidEngine.Graphics;
 
 namespace Troid.Entities
 {
@@ -15,11 +17,11 @@ namespace Troid.Entities
 
         public int ContactDamage;
 
-        public Enemy(World.World world) : base(world)
+        public Enemy(World world) : base(world)
         {
             Position = new Vector2(16, 24);
 
-            Graphics.Animation spin = new Graphics.Animation(new Rectangle[] {
+            Animation spin = new Animation(new Rectangle[] {
                 new Rectangle(0, 0, 16, 16),
                 new Rectangle(16, 0, 16, 16),
                 new Rectangle(32, 0, 16, 16),
@@ -39,7 +41,7 @@ namespace Troid.Entities
 
 		public override void Update(GameTime gameTime)
 		{
-			Player player = Room.GetPlayer();
+			Player player = (Player)World.CurrentRoom.GetPlayer();
 
 			if (player != null)
 			{
@@ -76,9 +78,9 @@ namespace Troid.Entities
 
 		public override void OnDeath()
 		{
-			Enemy newE = new Enemy(Room);
+			Enemy newE = new Enemy(World);
 			newE.SpriteSheet = this.SpriteSheet;
-			Room.Entities.Add(newE);
+			World.CurrentRoom.AddEntity(newE);
 		}
     }
 }

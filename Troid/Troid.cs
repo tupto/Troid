@@ -2,8 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Troid.Entities;
-using Troid.Graphics;
-using Troid.World;
+using TroidEngine.Graphics;
+using TroidEngine.World;
 
 namespace Troid
 {
@@ -15,7 +15,7 @@ namespace Troid
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        World.World world;
+        World world;
         Room testRoom;
         Room secondRoom;
         Player player;
@@ -42,12 +42,12 @@ namespace Troid
             graphics.PreferredBackBufferHeight = 160 * 2;
             graphics.ApplyChanges();
 
-            world = new World.World();
+            world = new World();
 
             camera = new Camera(world, GraphicsDevice.Viewport);
 
-			testRoom.AddEntity(player);
-			testRoom.AddEntity(evilbrain);
+			player = new Player(world);
+			evilbrain = new Enemy(world);
 
             base.Initialize();
         }
@@ -66,7 +66,7 @@ namespace Troid
             Tile.TileSheet = Content.Load<Texture2D>("tiles");
             Beam.BeamTex = Content.Load<Texture2D>("beam");
 
-            testRoom = Content.Load<Room>("room1");
+            testRoom = Content.Load<Room>("Rooms/room");
 
             testRoom.AddEntity(player);
 			testRoom.AddEntity(evilbrain);

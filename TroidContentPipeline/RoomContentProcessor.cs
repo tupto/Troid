@@ -1,10 +1,10 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Troid.World;
+using TroidEngine.World;
 using TroidContentPipeline.Contracts;
 
 using TInput = TroidContentPipeline.Contracts.RoomContract;
-using TOutput = Troid.World.Room;
+using TOutput = TroidEngine.World.Room;
 
 namespace TroidContentPipeline
 {
@@ -22,12 +22,12 @@ namespace TroidContentPipeline
     [ContentProcessor(DisplayName = "Troid Room Processor - Troid")]
     public class RoomContentProcessor : ContentProcessor<TInput, TOutput>
     {
-        public override Room Process(TInput input, ContentProcessorContext context)
+		public override TOutput Process(TInput input, ContentProcessorContext context)
         {
             int width = input.Tiles.Width;
             int height = input.Tiles.Height;
 
-            TOutput room = new Room(width, height);
+            TOutput room = new TOutput(width, height);
             room.SetTiles(input.Tiles.Data);
 
             return room;

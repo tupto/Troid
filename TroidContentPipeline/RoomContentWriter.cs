@@ -8,8 +8,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
 using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
-using TWrite = Troid.World.Room;
-using Troid.World;
+using TWrite = TroidEngine.World.Room;
 
 namespace TroidContentPipeline
 {
@@ -18,7 +17,7 @@ namespace TroidContentPipeline
     {
         public override string GetRuntimeReader(TargetPlatform targetPlatform)
         {
-            return "Troid.Utils.ContentReaders, Troid";
+            return "TroidEngine.ContentReaders.RoomContentReader, TroidEngine";
         }
 
         protected override void Write(ContentWriter output, TWrite value)
@@ -26,13 +25,14 @@ namespace TroidContentPipeline
             output.Write(value.Height);
             output.Write(value.Width);
 
-            for (int y = 0; y < value.Height; y++)
-            {
-                for (int x = 0; x < value.Width; x++)
-                {
-                    output.Write(value.GetTileID(x, y));
-                }
-            }
+			for (int y = 0; y < value.Height; y++)
+			{
+				for (int x = 0; x < value.Width; x++)
+				{
+					int id = value.GetTileID(x, y);
+					output.Write(id);
+				}
+			}
         }
     }
 }

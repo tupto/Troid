@@ -5,27 +5,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Troid.World;
+using TroidEngine.World;
+using TroidEngine.Entities;
+using TroidEngine.Graphics;
 
 namespace Troid.Entities
 {
-    public class Player : Entity
+    public class Player : PlayerBase
     {
-        private float shootTimer;
-        private float shootTimerMax;
-        private Vector2 shootOffset;
-
-        public Player(World.World world)
+        public Player(World world)
             : base(world)
         {
-            shootTimer = 0.0f;
-            shootTimerMax = 0.3f;
+            ShootTimer = 0.0f;
+            ShootTimerMax = 0.3f;
 
-            Animations.Add("idle", new Graphics.Animation(new Rectangle[] {
+            Animations.Add("idle", new Animation(new Rectangle[] {
                 new Rectangle(0, 0, 16, 16)
             }));
 
-            Graphics.Animation walk = new Graphics.Animation(new Rectangle[] {
+            Animation walk = new Animation(new Rectangle[] {
                 new Rectangle(0, 16, 16, 16),
                 new Rectangle(16, 16, 16, 16),
                 new Rectangle(32, 16, 16, 16),
@@ -36,20 +34,20 @@ namespace Troid.Entities
 
             Animations.Add("walk", walk);
 
-            Animations.Add("jump", new Graphics.Animation(new Rectangle[] {
+            Animations.Add("jump", new Animation(new Rectangle[] {
                 new Rectangle(48, 16, 16, 16)
             }));
 
             CurrAnimation = "idle";
             Position = new Vector2(140, 72);
-            shootOffset = new Vector2(16, 8);
+            ShootOffset = new Vector2(16, 8);
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (shootTimer < shootTimerMax)
+            if (ShootTimer < ShootTimerMax)
             {
-                shootTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                ShootTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
             KeyboardState ks = Keyboard.GetState();
@@ -72,9 +70,9 @@ namespace Troid.Entities
                 CurrAnimation = "idle";
             }
             
-            if (ks.IsKeyDown(Keys.LeftShift) && shootTimer >= shootTimerMax)
+            if (ks.IsKeyDown(Keys.LeftShift) && ShootTimer >= ShootTimerMax)
             {
-                shootTimer = 0.0f;
+				ShootTimer = 0.0f;
                 Vector2 shootPos = Position;
                 if (Direction == Direction.Right)
                 {

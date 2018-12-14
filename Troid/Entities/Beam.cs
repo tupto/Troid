@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Troid.World;
+using TroidEngine.World;
+using TroidEngine.Entities;
+using TroidEngine.Graphics;
 
 namespace Troid.Entities
 {
@@ -15,7 +17,7 @@ namespace Troid.Entities
 
         public int BeamDamage;
 
-        public Beam(World.World world, Vector2 position, Direction direction) : base(world)
+        public Beam(World world, Vector2 position, Direction direction) : base(world)
         {
             Position = position;
             Direction = direction;
@@ -37,12 +39,12 @@ namespace Troid.Entities
             {
                 SpriteSheet = BeamTex;
 
-                Animations.Add("move", new Graphics.Animation(new Rectangle[]
+                Animations.Add("move", new Animation(new Rectangle[]
                 {
                     new Rectangle(0, 0, 4, 4)
                 }));
 
-                Animations.Add("splode", new Graphics.Animation(new Rectangle[]
+                Animations.Add("splode", new Animation(new Rectangle[]
                 {
                     new Rectangle(4, 0, 4, 4),
                     new Rectangle(8, 0, 4, 4),

@@ -44,6 +44,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.XML" />
+    <Reference Include="TroidEngine">
+      <HintPath>..\TroidEngine\bin\Debug\TroidEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Contracts\TilesDataContract.cs" />
@@ -55,13 +58,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Troid\Troid.csproj">
-      <Project>{2426c9b8-9e8a-45f5-8fbf-3d6f2aab6f4f}</Project>
-      <Name>Troid</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

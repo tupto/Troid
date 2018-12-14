@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Content.Pipeline;
-using Troid.World;
+using TroidEngine.World;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
 using TroidContentPipeline.Contracts;
@@ -16,7 +16,7 @@ namespace TroidContentPipeline
     /// <summary>
     /// Used for importing Rooms to Troid
     /// </summary>
-    [ContentImporter(".room", DisplayName = "Room Data Importer", DefaultProcessor = "RoomContentProcessor")]
+    [ContentImporter(".room", DisplayName = "Troid Room Importer - Troid", DefaultProcessor = "RoomContentProcessor")]
     public class RoomContentImporter : ContentImporter<TImport>
     {
         public override TImport Import(string filename, ContentImporterContext context)
@@ -25,19 +25,28 @@ namespace TroidContentPipeline
 
             RoomContract roomContract = default(RoomContract);
 
-            using (var fileStream = new FileStream(filename, FileMode.Open))
+			string fileData = null;
+			using (var fileStream = new FileStream(filename, FileMode.Open))
             {
-                try
+				using (var streamReader = new StreamReader(fileStream))
+				{
+					fileData = streamReader.ReadToEnd();
+				}
+            }
+
+			using (var memoryStream = new MemoryStream(Encoding.Unicode.GetBytes(fileData)))
+			{
+				try
                 {
                     DataContractJsonSerializer dataSerializer = new DataContractJsonSerializer(typeof(RoomContract));
-                    roomContract = (RoomContract)dataSerializer.ReadObject(fileStream);
-                }
-                catch (SerializationException e)
-                {
-                    context.Logger.LogImportantMessage("SerializationException thrown reading RoomContract: {0}", e.Message);
-                    return null;
-                }
-            }
+					roomContract = (RoomContract)dataSerializer.ReadObject(memoryStream);
+				}
+				catch (SerializationException e)
+				{
+					context.Logger.LogImportantMessage("SerializationException thrown reading RoomContract: {0}", e.Message);
+					return null;
+				}
+			}
 
             return roomContract;
         }
