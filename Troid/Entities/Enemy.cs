@@ -35,6 +35,7 @@ namespace Troid.Entities
             CurrAnimation = "float";
 
             ContactDamage = 0;
+			MoveAcceleration = 1000.0f;
 
 			ApplyGravity = false;
         }

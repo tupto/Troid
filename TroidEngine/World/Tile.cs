@@ -36,6 +36,11 @@ namespace TroidEngine.World
 			}
 		}
 
+		public static int NumTiles
+		{
+			get { return sourceRects?.Length ?? 0; }
+		}
+
 		public int ID;
 		public TileCollision CollisionType;
 

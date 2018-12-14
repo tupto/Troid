@@ -23,7 +23,8 @@ namespace TroidEngine.ContentReaders
 			{
 				for (int x = 0; x < width; x++)
 				{
-					roomData[x + y * width] = input.ReadInt32();
+					int tileId = input.ReadInt32();
+					roomData[x + y * width] = tileId;
 				}
 			}
 

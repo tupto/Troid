@@ -14,6 +14,11 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ../../TroidRoomEditor/bin/Debug/Rooms/new_room.room
+/importer:RoomContentImporter
+/processor:RoomContentProcessor
+/build:../../TroidRoomEditor/bin/Debug/Rooms/new_room.room;Rooms/new_room.room
+
 #begin beam.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -25,6 +30,13 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:beam.png
+
+#begin btnFont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:btnFont.spritefont;arial12.spritefont
 
 #begin charsprites.bmp
 /importer:TextureImporter

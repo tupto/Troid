@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 using TWrite = TroidEngine.World.Room;
+using System.Text;
 
 namespace TroidContentPipeline
 {
@@ -24,15 +25,21 @@ namespace TroidContentPipeline
         {
             output.Write(value.Height);
             output.Write(value.Width);
-
+			int minonec = 0;
 			for (int y = 0; y < value.Height; y++)
 			{
 				for (int x = 0; x < value.Width; x++)
 				{
 					int id = value.GetTileID(x, y);
+					if (id == -1)
+					{
+						minonec++;
+					}
 					output.Write(id);
 				}
 			}
+
+			//throw new Exception("it was not 0 " + minonec + " times");
         }
     }
 }

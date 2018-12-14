@@ -53,6 +53,7 @@ namespace TroidEngine.World
 			if (Width * Height != tileData.Length)
 				throw new ArgumentException("Data length must equal height * width");
 
+			Tiles = new Tile[Width, Height];
 			for (int x = 0; x < Width; x++)
 			{
 				for (int y = 0; y < Height; y++)
@@ -92,7 +93,7 @@ namespace TroidEngine.World
 
 		public PlayerBase GetPlayer()
 		{
-			if (entities[playerIndex] is PlayerBase)
+			if (playerIndex != -1 && entities[playerIndex] is PlayerBase)
 				return (PlayerBase)entities[playerIndex];
 
 			return null;
@@ -111,7 +112,7 @@ namespace TroidEngine.World
 			return TileCollision.None;
 		}
 
-		public Rectangle GetTileBouds(int x, int y)
+		public Rectangle GetTileBounds(int x, int y)
 		{
 			return new Rectangle(x * Tile.TILE_WIDTH, y * Tile.TILE_HEIGHT, Tile.TILE_WIDTH, Tile.TILE_HEIGHT);
 		}

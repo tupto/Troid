@@ -33,17 +33,21 @@ namespace TroidEngine.Entities
 		public float GravityAcceleration = 800.0f;
 		public float JumpLaunchVelocity = -900.0f;
 		public float JumpControlPower = 0.2f;
-		public float KnockbackVelocity = 500.0f;
-		public float KnockbackControlPower = 0.8f;
+		public float KnockbackVelocity = 300.0f;
+		public float KnockbackControlPower = 0.2f;
 		public float WaterSpeedModifier = 0.3f;
 		public float MaxJumpTime = 0.50f;
 		public float MaxKnockbackTime = 0.50f;
+		public float KnockbackFlashInterval = 0.1f;
 		public float DrownTime = 5.0f;
 		public float MaxYSpeed = 200.0f;
 		public float MaxXSpeed = 1000.0f;
 		public float ShootTimer = 0.0f;
 		public float ShootTimerMax = 0.3f;
 		public Vector2 ShootOffset;
+
+		public Color Colour;
+		public Color DamageColour;
 
 		private int previousBottom;
 
@@ -54,6 +58,7 @@ namespace TroidEngine.Entities
 		protected float waterTimer;
 		protected bool beingKnockedback;
 		protected float knockbackTimer;
+		protected float knockbackFlashTimer;
 		protected Vector2 knockbackDirection;
 		protected bool somethingBelow;
 
@@ -66,6 +71,8 @@ namespace TroidEngine.Entities
 			ApplyGravity = true;
 			Alive = true;
 			Direction = Direction.Right;
+			Colour = Color.White;
+			DamageColour = new Color(255, 0, 0, 32);
 		}
 
 		protected void UpdateHitbox()
@@ -104,7 +111,7 @@ namespace TroidEngine.Entities
 
 					if (colType == TileCollision.Solid)
 					{
-						Rectangle tileBounds = World.CurrentRoom.GetTileBouds(x, y);
+						Rectangle tileBounds = World.CurrentRoom.GetTileBounds(x, y);
 						hitSomething = PushOutOfTile(tileBounds) || hitSomething;
 
 						if (y == worldBottom || y == worldBottom - 1)
@@ -114,7 +121,7 @@ namespace TroidEngine.Entities
 					}
 					else if (colType == TileCollision.Water)
 					{
-						InWater = InWater || Hitbox.Intersects(World.CurrentRoom.GetTileBouds(x, y));
+						InWater = InWater || Hitbox.Intersects(World.CurrentRoom.GetTileBounds(x, y));
 					}
 				}
 			}
@@ -147,6 +154,9 @@ namespace TroidEngine.Entities
 		{
 			if (!beingKnockedback)
 			{
+				if (direction == Vector2.Zero)
+					direction = new Vector2(0, -1);
+
 				knockbackDirection = direction;
 				knockbackDirection.Normalize();
 				knockbackTimer = 0.0f;
@@ -159,6 +169,7 @@ namespace TroidEngine.Entities
 			if (beingKnockedback)
 			{
 				knockbackTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+				knockbackFlashTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
 				if (knockbackTimer <= MaxKnockbackTime)
 				{
@@ -168,6 +179,16 @@ namespace TroidEngine.Entities
 				{
 					beingKnockedback = false;
 				}
+
+				if (knockbackFlashTimer <= KnockbackFlashInterval)
+				{
+					Colour = Colour == Color.White ? DamageColour : Color.White;
+					knockbackFlashTimer = 0.0f;
+				}
+			}
+			else if ( Colour == DamageColour)
+			{
+				Colour = Color.White;
 			}
 		}
 
@@ -246,8 +267,6 @@ namespace TroidEngine.Entities
 						Velocity.Y = 0;
 						UpdateHitbox();
 					}
-
-					PushOutOfTile(tileBounds);
 				}
 				else
 				{
@@ -319,7 +338,7 @@ namespace TroidEngine.Entities
 			}
 
 			spriteBatch.Draw(SpriteSheet, Position, animationRect,
-							 Color.White, 0, Vector2.Zero, new Vector2(1, 1), effects, 0.0f);
+							 Colour, 0, Vector2.Zero, new Vector2(1, 1), effects, 0.0f);
 		}
 
 		public virtual void OnWallHit()

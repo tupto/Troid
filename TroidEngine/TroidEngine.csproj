@@ -41,6 +41,7 @@
     <Compile Include="ContentReaders\RoomContentReader.cs" />
     <Compile Include="Entities\PlayerBase.cs" />
     <Compile Include="Entities\Door.cs" />
+    <Compile Include="Graphics\UI\Button.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Entities\" />
@@ -48,6 +49,7 @@
     <Folder Include="ContentReaders\" />
     <Folder Include="World\" />
     <Folder Include="Graphics\" />
+    <Folder Include="Graphics\UI\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
