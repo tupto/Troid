@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TroidEngine;
+using TroidEngine.ContentReaders.Contracts;
 using TroidEngine.Graphics;
-using TroidEngine.Grapihcs.UI;
+using TroidEngine.Graphics.UI;
 using TroidEngine.World;
 
 namespace TroidRoomEditor
@@ -23,14 +25,18 @@ namespace TroidRoomEditor
 
 		Texture2D pixel;
 
-		List<Button> uiOptions;
-		Button saveButton;
+		UIManager uiManager;
 		Camera camera;
 		World world;
 
 		Rectangle currentMouseBlock;
 		int currentTileIndex;
+		TileCollision currentCollisionMode;
 		bool bracketPressed = false;
+
+		bool collisionViewPressed = false;
+
+		bool editCollisionsMode = false;
 
 		public Game1()
 		{
@@ -51,13 +57,39 @@ namespace TroidRoomEditor
 			world = new World();
 			world.AddRoom(new Room(30, 20));
 
-			saveButton = new Button(new Rectangle(5, 5, 100, 30), "Hello!");
+			currentCollisionMode = TileCollision.None;
+
+			Button saveButton;
+			Button loadButton;
+			TextBox textBox;
+			Icon currentTileIcon;
+
+			textBox = new TextBox("textBox", new Rectangle(graphics.PreferredBackBufferWidth - 255,
+												graphics.PreferredBackBufferHeight - 35,
+												100, 30));
+			textBox.Text = "cool_room";
+
+			saveButton = new Button("saveBtn", new Rectangle(graphics.PreferredBackBufferWidth - 85,
+			                                      graphics.PreferredBackBufferHeight - 35,
+			                                      60, 30), "Save");
 			saveButton.OnClick += SaveButton_OnClick;
+
+			loadButton = new Button("loadBtn", new Rectangle(graphics.PreferredBackBufferWidth - 150,
+												  graphics.PreferredBackBufferHeight - 35,
+												  60, 30), "Load");
+			loadButton.OnClick += LoadButton_OnClick;
+
+			currentTileIcon = new Icon("tileIcn", new Rectangle(graphics.PreferredBackBufferWidth - 15,
+												 graphics.PreferredBackBufferHeight - 15,
+												 10, 10), Tile.TileSheet, null);
 
 			currentTileIndex = 0;
 
-			uiOptions = new List<Button>();
-			uiOptions.Add(saveButton);
+			uiManager = new UIManager(this);
+			uiManager.AddComponent(saveButton);
+			uiManager.AddComponent(loadButton);
+			uiManager.AddComponent(textBox);
+			uiManager.AddComponent(currentTileIcon);
 
 			camera = new Camera(world, GraphicsDevice.Viewport);
 
@@ -74,10 +106,12 @@ namespace TroidRoomEditor
 			spriteBatch = new SpriteBatch(GraphicsDevice);
 
             Tile.TileSheet = Content.Load<Texture2D>("tiles");
-			Button.Font = Content.Load<SpriteFont>("freesans12");
+			UIComponent.Font = Content.Load<SpriteFont>("freesans12");
 			pixel = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
 			pixel.SetData(new[] { Color.White });
-			Button.Pixel = pixel;
+			UIComponent.Pixel = pixel;
+
+			((Icon)uiManager.GetComponent("tileIcn")).IconSheet = Tile.TileSheet;
 		}
 
 		/// <summary>
@@ -87,74 +121,120 @@ namespace TroidRoomEditor
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Update(GameTime gameTime)
 		{
+			uiManager.Update(gameTime);
+
 			MouseState ms = Mouse.GetState();
 			KeyboardState ks = Keyboard.GetState();
 
 			Vector2 gameLocation = camera.GetGameLocation(new Vector2(ms.X, ms.Y));
 			int tileX = (int)gameLocation.X / Tile.TILE_WIDTH;
 			int tileY = (int)gameLocation.Y / Tile.TILE_HEIGHT;
-			bool buttonClicked = false;
 
-			if (ks.IsKeyDown(Keys.OemOpenBrackets))
+			if (!uiManager.UIInUse)
 			{
-				if (!bracketPressed)
+				if (ks.IsKeyDown(Keys.OemOpenBrackets))
 				{
-					currentTileIndex--;
-					bracketPressed = true;
-
-					if (currentTileIndex < 0)
-						currentTileIndex = Tile.NumTiles - 1;
-				}
-			}
-			else if (ks.IsKeyDown(Keys.OemCloseBrackets))
-			{
-				if (!bracketPressed)
-				{
-					currentTileIndex++;
-					bracketPressed = true;
-
-					if (currentTileIndex >= Tile.NumTiles)
-						currentTileIndex = 0;
-				}
-			}
-			else
-			{
-				bracketPressed = false;
-			}
-
-			foreach (Button btn in uiOptions)
-			{
-				if (btn.Bounds.Contains(ms.X, ms.Y))
-				{
-					if (ms.LeftButton == ButtonState.Pressed)
+					if (!bracketPressed)
 					{
-						buttonClicked = true;
-						btn.Click();
+						if (!editCollisionsMode)
+						{
+							currentTileIndex--;
+							bracketPressed = true;
+
+							if (currentTileIndex < 0)
+								currentTileIndex = Tile.NumTiles - 1;
+
+							((Icon)uiManager.GetComponent("tileIcn")).SourceRectangle = Tile.GetSourceRect(currentTileIndex);
+						}
+						else
+						{
+							bracketPressed = true;
+							var numCollisionModes = System.Enum.GetValues(typeof(TileCollision)).Length;
+							currentCollisionMode++;
+							if ((int)currentCollisionMode >= numCollisionModes)
+								currentCollisionMode = 0;
+						}
 					}
 				}
-			}
-
-			if (tileX >= world.CurrentRoom.Width)
-				tileX = world.CurrentRoom.Width - 1;
-
-			if (tileX < 0)
-				tileX = 0;
-
-			if (tileY >= world.CurrentRoom.Height)
-				tileY = world.CurrentRoom.Height - 1;
-
-			if (tileY < 0)
-				tileY = 0;
-
-			if (!buttonClicked)
-			{
-				if (ms.LeftButton == ButtonState.Pressed)
+				else if (ks.IsKeyDown(Keys.OemCloseBrackets))
 				{
-					world.CurrentRoom.Tiles[tileX, tileY] = new Tile(currentTileIndex);
-				}
-			}
+					if (!bracketPressed)
+					{
+						if (!editCollisionsMode)
+						{
+							currentTileIndex++;
+							bracketPressed = true;
 
-			currentMouseBlock = world.CurrentRoom.GetTileBounds(tileX, tileY);
+							if (currentTileIndex >= Tile.NumTiles)
+								currentTileIndex = 0;
+
+							((Icon)uiManager.GetComponent("tileIcn")).SourceRectangle = Tile.GetSourceRect(currentTileIndex);
+						}
+						else
+						{
+							bracketPressed = true;
+							var numCollisionModes = System.Enum.GetValues(typeof(TileCollision)).Length;
+							currentCollisionMode--;
+							if ((int)currentCollisionMode < 0)
+								currentCollisionMode = (TileCollision)numCollisionModes - 1;
+						}
+					}
+				}
+				else
+				{
+					bracketPressed = false;
+				}
+
+				if (ks.IsKeyDown(Keys.C))
+				{
+					if (!collisionViewPressed)
+					{
+						collisionViewPressed = true;
+						editCollisionsMode = !editCollisionsMode;
+					}
+				}
+				else
+				{
+					collisionViewPressed = false;
+				}
+
+				if (tileX >= world.CurrentRoom.Width)
+					tileX = world.CurrentRoom.Width - 1;
+
+				if (tileX < 0)
+					tileX = 0;
+
+				if (tileY >= world.CurrentRoom.Height)
+					tileY = world.CurrentRoom.Height - 1;
+
+				if (tileY < 0)
+					tileY = 0;
+
+				if (!uiManager.UIClicked)
+				{
+					if (!editCollisionsMode)
+					{
+						if (ms.LeftButton == ButtonState.Pressed)
+						{
+							world.CurrentRoom.Tiles[tileX, tileY] = new Tile(currentTileIndex);
+						}
+						else if (ms.RightButton == ButtonState.Pressed)
+						{
+							world.CurrentRoom.Tiles[tileX, tileY] = null;
+						}
+					}
+					else
+					{
+						if (ms.LeftButton == ButtonState.Pressed)
+						{
+							if (world.CurrentRoom.Tiles[tileX, tileY] != null)
+								world.CurrentRoom.Tiles[tileX, tileY].CollisionType = currentCollisionMode;
+						}
+					}
+				}
+
+				currentMouseBlock = world.CurrentRoom.GetTileBounds(tileX, tileY);
+			}
 
 			base.Update(gameTime);
 		}
@@ -172,14 +252,16 @@ namespace TroidRoomEditor
 			world.Draw(spriteBatch);
 			DrawBorder(currentMouseBlock, 1, Color.Magenta);
 
+			if (editCollisionsMode)
+			{
+				world.CurrentRoom.DrawCollisionBoxes(spriteBatch, DrawBorder);
+			}
+
 			spriteBatch.End();
 
 			spriteBatch.Begin();
 
-			foreach (Button btn in uiOptions)
-			{
-				btn.Draw(spriteBatch);
-			}
+			uiManager.Draw(spriteBatch);
 
 			spriteBatch.End();
 
@@ -208,19 +290,20 @@ namespace TroidRoomEditor
 
 		void SaveButton_OnClick()
 		{
-			RoomDataContract rc = new RoomDataContract();
-			rc.Tiles = new TilesDataContract();
+			TroidEngine.ContentReaders.Contracts.RoomDataContract rc = new TroidEngine.ContentReaders.Contracts.RoomDataContract();
+			rc.Data = new TileDataContract[world.CurrentRoom.Width * world.CurrentRoom.Height];
 
-			rc.Tiles.Width = world.CurrentRoom.Width;
-			rc.Tiles.Height = world.CurrentRoom.Height;
+			rc.Width = world.CurrentRoom.Width;
+			rc.Height = world.CurrentRoom.Height;
 
-			rc.Tiles.Data = new int[rc.Tiles.Width * rc.Tiles.Height];
-			for (int i = 0; i < rc.Tiles.Data.Length; i++)
+			for (int i = 0; i < rc.Data.Length; i++)
 			{
-				int x = i % rc.Tiles.Width;
-				int y = i / rc.Tiles.Width;
+				int x = i % rc.Width;
+				int y = i / rc.Width;
 
-				rc.Tiles.Data[i] = world.CurrentRoom.GetTileID(x, y);
+				rc.Data[i] = new TileDataContract();
+				rc.Data[i].ID = world.CurrentRoom.GetTileID(x, y);
+				rc.Data[i].CollisionType = (int)world.CurrentRoom.GetTileCollision(x, y);
 			}
 
 			using (MemoryStream ms = new MemoryStream())
@@ -244,10 +327,63 @@ namespace TroidRoomEditor
 					Directory.CreateDirectory("Rooms");
 				}
 
-				FileStream room = File.Create(@"Rooms/new_room.room");
+				FileStream room = File.Create(@"Rooms/" + uiManager.GetComponent("textBox").Text + ".room");
 				byte[] bytes = Encoding.UTF8.GetBytes(json);
 				room.Write(bytes, 0, bytes.Length);
 				room.Close();
+			}
+		}
+
+		public void LoadButton_OnClick()
+		{
+			string fileName = "Rooms/" + uiManager.GetComponent("textBox").Text + ".room";
+			if (File.Exists("Rooms/" + uiManager.GetComponent("textBox").Text + ".room"))
+			{
+				TroidEngine.ContentReaders.Contracts.RoomDataContract roomContract = default(TroidEngine.ContentReaders.Contracts.RoomDataContract);
+				string fileData = null;
+				using (var fileStream = new FileStream(fileName, FileMode.Open))
+				{
+					using (var streamReader = new StreamReader(fileStream))
+					{
+						fileData = streamReader.ReadToEnd();
+					}
+				}
+
+				using (var memoryStream = new MemoryStream(Encoding.Unicode.GetBytes(fileData)))
+				{
+					try
+					{
+						DataContractJsonSerializer dataSerializer = new DataContractJsonSerializer(typeof(TroidEngine.ContentReaders.Contracts.RoomDataContract));
+						roomContract = (TroidEngine.ContentReaders.Contracts.RoomDataContract)dataSerializer.ReadObject(memoryStream);
+					}
+					catch (SerializationException e)
+					{
+						return;
+					}
+				}
+
+				int width = roomContract.Width;
+				int height = roomContract.Height;
+
+				Room room = new Room(width, height);
+				if (width * height != roomContract.Data.Length)
+					throw new ArgumentException("Data length must equal height * width");
+
+				room.Tiles = new Tile[width, height];
+				for (int x = 0; x < width; x++)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						if (roomContract.Data[x + y * width].ID == -1)
+							continue;
+
+						room.Tiles[x, y] = new Tile(roomContract.Data[x + y * width].ID);
+						room.Tiles[x, y].CollisionType = (TileCollision)roomContract.Data[x + y * width].CollisionType;
+					}
+				}
+
+				world.AddRoom(room);
+				world.CurrentRoom = room;
 			}
 		}
 	}

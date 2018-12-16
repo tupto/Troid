@@ -17,19 +17,17 @@ namespace TroidEngine.ContentReaders
 			int height = input.ReadInt32();
 			int width = input.ReadInt32();
 
-			int[] roomData = new int[width * height];
+			Room room = new TRead(width, height);
+			room.Tiles = new Tile[width, height];
 
 			for (int y = 0; y < height; y++)
 			{
 				for (int x = 0; x < width; x++)
 				{
-					int tileId = input.ReadInt32();
-					roomData[x + y * width] = tileId;
+					room.Tiles[x, y] = new Tile(input.ReadInt32());
+					room.Tiles[x, y].CollisionType = (TileCollision)input.ReadInt32();
 				}
 			}
-
-			Room room = new TRead(width, height);
-			room.SetTiles(roomData);
 
 			return room;
 		}

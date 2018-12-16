@@ -48,24 +48,6 @@ namespace TroidEngine.World
 			AddEntity(door);
 		}
 
-		public void SetTiles(int[] tileData)
-		{
-			if (Width * Height != tileData.Length)
-				throw new ArgumentException("Data length must equal height * width");
-
-			Tiles = new Tile[Width, Height];
-			for (int x = 0; x < Width; x++)
-			{
-				for (int y = 0; y < Height; y++)
-				{
-					if (tileData[x + y * Width] == -1)
-						continue;
-					
-					Tiles[x, y] = new Tile(tileData[x + y * Width]);
-				}
-			}
-		}
-
 		public int GetTileID(int x, int y)
 		{
 			if (Tiles[x, y] != null)
@@ -189,6 +171,35 @@ namespace TroidEngine.World
 			for (int i = 0; i < waterTiles.Count; i++)
 			{
 				waterTiles[i].Draw(waterTilesX[i], waterTilesY[i], spriteBatch);
+			}
+		}
+
+		public void DrawCollisionBoxes(SpriteBatch spriteBatch, Action<Rectangle, int, Color> drawBorder)
+		{
+			for (int x = 0; x < Width; x++)
+			{
+				for (int y = 0; y < Height; y++)
+				{
+					if (Tiles[x, y] != null)
+					{
+						Rectangle collisionBounds = GetTileBounds(x, y);
+						Color collisionColour = Color.White;
+
+						switch (Tiles[x, y].CollisionType)
+						{
+							case TileCollision.None:
+								continue;
+							case TileCollision.Solid:
+								collisionColour = Color.Red;
+								break;
+							case TileCollision.Water:
+								collisionColour = Color.Blue;
+								break;
+						}
+
+						drawBorder(collisionBounds, 1, collisionColour);
+					}
+				}
 			}
 		}
 	}

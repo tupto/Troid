@@ -9,7 +9,7 @@ using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
 using TroidContentPipeline.Contracts;
 
-using TImport = TroidContentPipeline.Contracts.RoomContract;
+using TImport = TroidEngine.ContentReaders.Contracts.RoomDataContract;
 
 namespace TroidContentPipeline
 {
@@ -23,7 +23,7 @@ namespace TroidContentPipeline
         {
             context.Logger.LogMessage("Importing JSON file: {0}", filename);
 
-            RoomContract roomContract = default(RoomContract);
+            TImport roomContract = default(TImport);
 
 			string fileData = null;
 			using (var fileStream = new FileStream(filename, FileMode.Open))
@@ -38,8 +38,8 @@ namespace TroidContentPipeline
 			{
 				try
                 {
-                    DataContractJsonSerializer dataSerializer = new DataContractJsonSerializer(typeof(RoomContract));
-					roomContract = (RoomContract)dataSerializer.ReadObject(memoryStream);
+                    DataContractJsonSerializer dataSerializer = new DataContractJsonSerializer(typeof(RoomDataContract));
+					roomContract = (TImport)dataSerializer.ReadObject(memoryStream);
 				}
 				catch (SerializationException e)
 				{

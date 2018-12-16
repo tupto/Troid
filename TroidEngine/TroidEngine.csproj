@@ -42,6 +42,12 @@
     <Compile Include="Entities\PlayerBase.cs" />
     <Compile Include="Entities\Door.cs" />
     <Compile Include="Graphics\UI\Button.cs" />
+    <Compile Include="Graphics\UI\Icon.cs" />
+    <Compile Include="Graphics\UI\UIComponent.cs" />
+    <Compile Include="Graphics\UI\TextBox.cs" />
+    <Compile Include="Graphics\UI\UIManager.cs" />
+    <Compile Include="ContentReaders\Contracts\RoomDataContract.cs" />
+    <Compile Include="ContentReaders\Contracts\TileDataContract.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Entities\" />
@@ -50,6 +56,7 @@
     <Folder Include="World\" />
     <Folder Include="Graphics\" />
     <Folder Include="Graphics\UI\" />
+    <Folder Include="ContentReaders\Contracts\" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

@@ -66,7 +66,7 @@ namespace Troid
             Tile.TileSheet = Content.Load<Texture2D>("tiles");
             Beam.BeamTex = Content.Load<Texture2D>("beam");
 
-            testRoom = Content.Load<Room>("Rooms/new_room");
+            testRoom = Content.Load<Room>("Rooms/cool_room");
 
             testRoom.AddEntity(player);
 			testRoom.AddEntity(evilbrain);

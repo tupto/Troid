@@ -12,6 +12,7 @@ namespace TroidEngine.World
 	public class World
 	{
 		public Room CurrentRoom;
+		public bool DebugMode;
 
 		private List<Room> rooms;
 

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using TroidEngine.World;
 using TroidContentPipeline.Contracts;
 
-using TInput = TroidContentPipeline.Contracts.RoomContract;
+using TInput = TroidEngine.ContentReaders.Contracts.RoomDataContract;
 using TOutput = TroidEngine.World.Room;
 
 namespace TroidContentPipeline
@@ -24,11 +24,26 @@ namespace TroidContentPipeline
     {
 		public override TOutput Process(TInput input, ContentProcessorContext context)
         {
-            int width = input.Tiles.Width;
-            int height = input.Tiles.Height;
+            int width = input.Width;
+            int height = input.Height;
 
             TOutput room = new TOutput(width, height);
-            room.SetTiles(input.Tiles.Data);
+
+			if (width * height != input.Data.Length)
+				throw new ArgumentException("Data length must equal height * width");
+
+			room.Tiles = new Tile[width, height];
+			for (int x = 0; x < width; x++)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					if (input.Data[x + y * width].ID == -1)
+						continue;
+
+					room.Tiles[x, y] = new Tile(input.Data[x + y * width].ID);
+					room.Tiles[x, y].CollisionType = (TileCollision)input.Data[x + y * width].CollisionType;
+				}
+			}
 
             return room;
         }

@@ -36,6 +36,7 @@ namespace TroidContentPipeline
 						minonec++;
 					}
 					output.Write(id);
+					output.Write((int)value.GetTileCollision(x, y));
 				}
 			}
 

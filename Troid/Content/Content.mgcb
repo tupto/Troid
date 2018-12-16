@@ -14,6 +14,11 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ../../TroidRoomEditor/bin/Debug/Rooms/cool_room.room
+/importer:RoomContentImporter
+/processor:RoomContentProcessor
+/build:../../TroidRoomEditor/bin/Debug/Rooms/cool_room.room;Rooms/cool_room.room
+
 #begin ../../TroidRoomEditor/bin/Debug/Rooms/new_room.room
 /importer:RoomContentImporter
 /processor:RoomContentProcessor

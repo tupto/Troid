@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace TroidContentPipeline.Contracts
+namespace TroidEngine.ContentReaders.Contracts
 {
     [DataContract]
     public class RoomDataContract

@@ -76,11 +76,11 @@ namespace Troid.Entities
                 Vector2 shootPos = Position;
                 if (Direction == Direction.Right)
                 {
-                    shootPos += new Vector2(16, 8);
+                    shootPos += new Vector2(13, 8);
                 }
                 else
                 {
-                    shootPos += new Vector2(0, 8);
+                    shootPos += new Vector2(2, 8);
                 }
 
                 Beam beam = new Beam(World, shootPos, Direction);

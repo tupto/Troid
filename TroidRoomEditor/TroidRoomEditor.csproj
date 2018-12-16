@@ -41,8 +41,6 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RoomDataContract.cs" />
-    <Compile Include="TilesDataContract.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Icon.png" />

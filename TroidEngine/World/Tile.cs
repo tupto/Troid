@@ -41,6 +41,11 @@ namespace TroidEngine.World
 			get { return sourceRects?.Length ?? 0; }
 		}
 
+		public static Rectangle GetSourceRect(int id)
+		{
+			return sourceRects[id];
+		}
+
 		public int ID;
 		public TileCollision CollisionType;
 
@@ -66,8 +71,8 @@ namespace TroidEngine.World
 
 	public enum TileCollision
 	{
-		None,
-		Solid,
-		Water
+		None = 0,
+		Solid = 1,
+		Water = 2
 	}
 }
