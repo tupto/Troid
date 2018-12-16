@@ -24,7 +24,7 @@ namespace TroidEngine.Entities
 		{
 			if (entity is PlayerBase)
 			{
-				World.LoadRoom(ConnectingRoomName, ConnectingDoorName);
+				World.LoadRoom(ConnectingRoomName, this);
 			}
 		}
 	}
