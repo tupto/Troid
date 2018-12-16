@@ -46,8 +46,8 @@ namespace Troid
 
             camera = new Camera(world, GraphicsDevice.Viewport);
 
-			player = new Player(world);
-			evilbrain = new Enemy(world);
+			player = new Player();
+			evilbrain = new Enemy("evilbrain");
 
             base.Initialize();
         }
@@ -67,11 +67,13 @@ namespace Troid
             Beam.BeamTex = Content.Load<Texture2D>("beam");
 
             testRoom = Content.Load<Room>("Rooms/cool_room");
+			secondRoom = Content.Load<Room>("Rooms/new_room");
+
+            world.AddRoom(testRoom);
+			world.AddRoom(secondRoom);
 
             testRoom.AddEntity(player);
 			testRoom.AddEntity(evilbrain);
-
-            world.AddRoom(testRoom);
 
             pixel = new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color);
             pixel.SetData(new[] { Color.White });

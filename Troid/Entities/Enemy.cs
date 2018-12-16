@@ -17,7 +17,7 @@ namespace Troid.Entities
 
         public int ContactDamage;
 
-        public Enemy(World world) : base(world)
+        public Enemy(string name) : base(name)
         {
             Position = new Vector2(16, 24);
 
@@ -79,7 +79,7 @@ namespace Troid.Entities
 
 		public override void OnDeath()
 		{
-			Enemy newE = new Enemy(World);
+			Enemy newE = new Enemy("evilbrain");
 			newE.SpriteSheet = this.SpriteSheet;
 			World.CurrentRoom.AddEntity(newE);
 		}

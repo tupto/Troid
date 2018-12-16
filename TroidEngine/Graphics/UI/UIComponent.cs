@@ -18,11 +18,15 @@ namespace TroidEngine.Graphics.UI
 		public Color BodyColour;
 		public Color HoverColour;
 		public Color TextColour;
+		public bool Visible;
 
 		private bool mousedIn;
 
 		public delegate void OnClickEventHandler();
 		public event OnClickEventHandler OnClick;
+
+		public delegate void OnEnterEventHandler();
+		public event OnClickEventHandler OnEnter;
 
 		public delegate void OnMouseInEventHandler();
 		public event OnMouseInEventHandler OnMouseIn;
@@ -39,14 +43,19 @@ namespace TroidEngine.Graphics.UI
 			this.HoverColour = Color.Magenta;
 			this.TextColour = Color.Black;
 			this.BorderWidth = 1;
+			this.Visible = true;
 
 			OnClick += NoOp;
 			OnMouseIn += NoOp;
 			OnMouseOut += NoOp;
+			OnEnter += NoOp;
 		}
 
 		public virtual void Draw(SpriteBatch spriteBatch)
 		{
+			if (!Visible)
+				return;
+
 			if (BorderWidth != 0)
 			{
 				spriteBatch.Draw(Pixel, Bounds, BorderColour);
@@ -66,7 +75,7 @@ namespace TroidEngine.Graphics.UI
 				spriteBatch.Draw(Pixel, bodyBounds, HoverColour);
 			}
 
-			if (Text != "")
+			if (Text != "" && Text != null)
 			{
 				string textToDraw = FormatText();
 				Vector2 textSize = Font.MeasureString(textToDraw);
@@ -92,6 +101,9 @@ namespace TroidEngine.Graphics.UI
 
 		protected string CropText(string text)
 		{
+			if (text == null)
+				return null;
+			
 			Vector2 textSize = Font.MeasureString(text);
 			if (textSize.X > Bounds.Width - (BorderWidth * 2) - 4)
 			{
@@ -106,6 +118,11 @@ namespace TroidEngine.Graphics.UI
 		public void Click()
 		{
 			OnClick();
+		}
+
+		public void Enter()
+		{
+			OnEnter();
 		}
 
 		public void MouseIn()

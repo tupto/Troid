@@ -17,7 +17,7 @@ namespace Troid.Entities
 
         public int BeamDamage;
 
-        public Beam(World world, Vector2 position, Direction direction) : base(world)
+        public Beam(Vector2 position, Direction direction) : base(null)
         {
             Position = position;
             Direction = direction;

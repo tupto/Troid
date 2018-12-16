@@ -29,6 +29,9 @@ namespace TroidEngine.Graphics.UI
 					if (e.Key == Keys.Escape)
 						uic.HasFocus = false;
 
+					if (e.Key == Keys.Enter)
+						uic.Enter();
+
 					if ((uic) is TextBox)
 					{
 						TextBox tb = (uic) as TextBox;
@@ -72,6 +75,11 @@ namespace TroidEngine.Graphics.UI
 
 			foreach (UIComponent uic in components.Values)
 			{
+				if (!uic.Visible)
+				{
+					continue;
+				}
+
 				if (uic.HasFocus)
 				{
 					UIInUse = true;
@@ -81,9 +89,9 @@ namespace TroidEngine.Graphics.UI
 				{
 					if (ms.LeftButton == ButtonState.Pressed)
 					{
-						uic.Click();
 						uic.HasFocus = true;
 						UIClicked = true;
+						uic.Click();
 					}
 					else
 					{

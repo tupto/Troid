@@ -79,11 +79,6 @@
 /processorParam:TextureFormat=Color
 /build:player.png
 
-#begin Rooms/room.room
-/importer:RoomContentImporter
-/processor:RoomContentProcessor
-/build:Rooms/room.room
-
 #begin spin.png
 /importer:TextureImporter
 /processor:TextureProcessor

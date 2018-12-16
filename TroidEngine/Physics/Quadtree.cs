@@ -10,7 +10,7 @@ namespace TroidEngine.Physics
 {
 	public class Quadtree
 	{
-		private const int MAX_OBJECTS = 1;
+		private const int MAX_OBJECTS = 10;
 		private const int MAX_LEVELS = 5;
 
 		private int level;
@@ -121,6 +121,9 @@ namespace TroidEngine.Physics
 
 		private int GetIndex(Entity rect)
 		{
+			if (!bounds.Intersects(rect.Hitbox))
+				return -1;
+
 			int index = -1;
 			float verticalMidpoint = bounds.X + ((float)bounds.Width / 2);
 			float horizontalMidpoint = bounds.X + ((float)bounds.Width / 2);

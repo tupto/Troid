@@ -14,16 +14,22 @@ namespace TroidEngine.World
 		public Room CurrentRoom;
 		public bool DebugMode;
 
-		private List<Room> rooms;
+		private Dictionary<string, Room> rooms;
 
 		public World()
 		{
-			rooms = new List<Room>();
+			rooms = new Dictionary<string, Room>();
 		}
 
 		public void AddRoom(Room room)
 		{
-			rooms.Add(room);
+			room.World = this;
+			rooms.Add(room.Name ?? "unknown_room", room);
+
+			foreach (Entity entity in room.GetEntities())
+			{
+				entity.World = this;
+			}
 
 			if (CurrentRoom == null)
 			{
@@ -31,12 +37,33 @@ namespace TroidEngine.World
 			}
 		}
 
-		public void LoadRoom(int index)
+		public void LoadRoom(string name, string door = null)
 		{
 			PlayerBase player = CurrentRoom.GetPlayer();
 			CurrentRoom.RemoveEntity(player);
-			CurrentRoom = rooms[index];
+
+			CurrentRoom = rooms[name];
 			CurrentRoom.AddEntity(player);
+
+			if (door != null)
+			{
+				foreach (Entity entity in CurrentRoom.GetEntities())
+				{
+					if (entity is Door && entity.Name == door)
+					{
+						player.Position = entity.Position;
+
+						if (player.Direction == Direction.Left)
+						{
+							player.Position.X -= player.Hitbox.Width;
+						}
+						else
+						{
+							player.Position.X += player.Hitbox.Width;
+						}
+					}
+				}
+			}
 		}
 
 		public void Update(GameTime gameTime)

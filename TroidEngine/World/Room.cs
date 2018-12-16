@@ -13,9 +13,12 @@ namespace TroidEngine.World
 {
 	public class Room
 	{
+		public string Name;
 		public int Width;
 		public int Height;
 		public Tile[,] Tiles;
+		public World World;
+		public Rectangle RoomBounds;
 
 		public Quadtree quad;
 
@@ -31,21 +34,17 @@ namespace TroidEngine.World
 
 		private List<Entity> entities;
 		private int playerIndex;
-		private World world;
 
 		public Room(int width, int height)
 		{
 			Width = width;
 			Height = height;
 			Tiles = new Tile[width, height];
+			RoomBounds = new Rectangle(0, 0, PixelWidth, PixelHeight);
 			entities = new List<Entity>();
 			playerIndex = -1;
 
 			quad = new Quadtree(0, new Rectangle(0, 0, width * Tile.TILE_WIDTH, height * Tile.TILE_HEIGHT));
-
-			Door door = new Door(world, new Vector2(0, (height - 3) * Tile.TILE_HEIGHT));
-			door.ConnectingRoomId = (width / 30) - 1;
-			AddEntity(door);
 		}
 
 		public int GetTileID(int x, int y)
@@ -57,9 +56,10 @@ namespace TroidEngine.World
 
 		public void AddEntity(Entity entity)
 		{
+			entity.World = World;
 			entities.Add(entity);
 
-			if (entity is PlayerBase)
+			if (typeof(PlayerBase).GetTypeInfo().IsAssignableFrom(entity.GetType().GetTypeInfo()))
 				playerIndex = entities.Count - 1;
 		}
 
@@ -75,8 +75,13 @@ namespace TroidEngine.World
 
 		public PlayerBase GetPlayer()
 		{
-			if (playerIndex != -1 && entities[playerIndex] is PlayerBase)
-				return (PlayerBase)entities[playerIndex];
+			foreach (Entity entity in GetEntities())
+			{
+				if (entity.Name == "player")
+				{
+					return (PlayerBase)entity;
+				}
+			}
 
 			return null;
 		}
@@ -113,7 +118,11 @@ namespace TroidEngine.World
 			{
 				entities[i].Update(gameTime);
 
-				objects.Clear();
+				if (!entities[i].Hitbox.Intersects(RoomBounds))
+				{
+					entities[i].Alive = false;
+				}
+
 				objects = quad.Retreive(objects, entities[i]);
 
 				for (int j = 0; j < objects.Count; j++)

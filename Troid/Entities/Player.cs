@@ -13,8 +13,8 @@ namespace Troid.Entities
 {
     public class Player : PlayerBase
     {
-        public Player(World world)
-            : base(world)
+        public Player()
+            : base()
         {
             ShootTimer = 0.0f;
             ShootTimerMax = 0.3f;
@@ -83,7 +83,7 @@ namespace Troid.Entities
                     shootPos += new Vector2(2, 8);
                 }
 
-                Beam beam = new Beam(World, shootPos, Direction);
+                Beam beam = new Beam(shootPos, Direction);
                 World.CurrentRoom.AddEntity(beam);
             }
 

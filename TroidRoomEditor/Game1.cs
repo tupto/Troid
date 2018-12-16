@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using TroidEngine;
 using TroidEngine.ContentReaders.Contracts;
+using TroidEngine.Entities;
 using TroidEngine.Graphics;
 using TroidEngine.Graphics.UI;
 using TroidEngine.World;
@@ -34,9 +35,17 @@ namespace TroidRoomEditor
 		TileCollision currentCollisionMode;
 		bool bracketPressed = false;
 
-		bool collisionViewPressed = false;
+		Vector2 doorPlacePosition;
+		bool prompting;
 
-		bool editCollisionsMode = false;
+		bool editModeCyclePressed = false;
+
+		EditMode editMode = EditMode.Tile;
+
+		private enum EditMode
+		{
+			Tile, Collision, Door
+		}
 
 		public Game1()
 		{
@@ -55,7 +64,9 @@ namespace TroidRoomEditor
 			IsMouseVisible = true;
 
 			world = new World();
-			world.AddRoom(new Room(30, 20));
+			Room room = new Room(30, 20);
+			room.Name = "new_room";
+			world.AddRoom(room);
 
 			currentCollisionMode = TileCollision.None;
 
@@ -63,6 +74,10 @@ namespace TroidRoomEditor
 			Button loadButton;
 			TextBox textBox;
 			Icon currentTileIcon;
+			Label modeLabel;
+			Box doorPromptBox;
+			TextBox connectingRoomText;
+			TextBox connectingDoorNameText;
 
 			textBox = new TextBox("textBox", new Rectangle(graphics.PreferredBackBufferWidth - 255,
 												graphics.PreferredBackBufferHeight - 35,
@@ -83,6 +98,27 @@ namespace TroidRoomEditor
 												 graphics.PreferredBackBufferHeight - 15,
 												 10, 10), Tile.TileSheet, null);
 
+			modeLabel = new Label("modeLbl", new Rectangle(graphics.PreferredBackBufferWidth - 115,
+			                                               5, 100, 30), editMode.ToString());
+
+			doorPromptBox = new Box("doorPromptBox", new Rectangle(0, 0,
+			                                               graphics.PreferredBackBufferWidth,
+			                                               graphics.PreferredBackBufferHeight));
+			doorPromptBox.Visible = false;
+
+			connectingDoorNameText = new TextBox("connectingDoorNameTxt", new Rectangle(
+												graphics.PreferredBackBufferWidth / 2 - 75,
+												graphics.PreferredBackBufferHeight / 2 - 15, 150, 30));
+			connectingDoorNameText.Text = "door_name";
+			connectingDoorNameText.Visible = false;
+			connectingDoorNameText.OnEnter += PromptTextBox_OnEnter;
+
+			connectingRoomText = new TextBox("connectToRoomTxt", new Rectangle(
+												graphics.PreferredBackBufferWidth / 2 - 75,
+												graphics.PreferredBackBufferHeight / 2 - 50, 150, 30));
+			connectingRoomText.Text = "room_name";
+			connectingRoomText.Visible = false;
+
 			currentTileIndex = 0;
 
 			uiManager = new UIManager(this);
@@ -90,6 +126,10 @@ namespace TroidRoomEditor
 			uiManager.AddComponent(loadButton);
 			uiManager.AddComponent(textBox);
 			uiManager.AddComponent(currentTileIcon);
+			uiManager.AddComponent(modeLabel);
+			uiManager.AddComponent(doorPromptBox);
+			uiManager.AddComponent(connectingDoorNameText);
+			uiManager.AddComponent(connectingRoomText);
 
 			camera = new Camera(world, GraphicsDevice.Viewport);
 
@@ -136,7 +176,7 @@ namespace TroidRoomEditor
 				{
 					if (!bracketPressed)
 					{
-						if (!editCollisionsMode)
+						if (editMode == EditMode.Tile)
 						{
 							currentTileIndex--;
 							bracketPressed = true;
@@ -146,7 +186,7 @@ namespace TroidRoomEditor
 
 							((Icon)uiManager.GetComponent("tileIcn")).SourceRectangle = Tile.GetSourceRect(currentTileIndex);
 						}
-						else
+						else if (editMode == EditMode.Collision)
 						{
 							bracketPressed = true;
 							var numCollisionModes = System.Enum.GetValues(typeof(TileCollision)).Length;
@@ -154,13 +194,16 @@ namespace TroidRoomEditor
 							if ((int)currentCollisionMode >= numCollisionModes)
 								currentCollisionMode = 0;
 						}
+						else if (editMode == EditMode.Door)
+						{
+						}
 					}
 				}
 				else if (ks.IsKeyDown(Keys.OemCloseBrackets))
 				{
 					if (!bracketPressed)
 					{
-						if (!editCollisionsMode)
+						if (editMode == EditMode.Tile)
 						{
 							currentTileIndex++;
 							bracketPressed = true;
@@ -169,14 +212,6 @@ namespace TroidRoomEditor
 								currentTileIndex = 0;
 
 							((Icon)uiManager.GetComponent("tileIcn")).SourceRectangle = Tile.GetSourceRect(currentTileIndex);
-						}
-						else
-						{
-							bracketPressed = true;
-							var numCollisionModes = System.Enum.GetValues(typeof(TileCollision)).Length;
-							currentCollisionMode--;
-							if ((int)currentCollisionMode < 0)
-								currentCollisionMode = (TileCollision)numCollisionModes - 1;
 						}
 					}
 				}
@@ -187,15 +222,21 @@ namespace TroidRoomEditor
 
 				if (ks.IsKeyDown(Keys.C))
 				{
-					if (!collisionViewPressed)
+					if (!editModeCyclePressed)
 					{
-						collisionViewPressed = true;
-						editCollisionsMode = !editCollisionsMode;
+						editModeCyclePressed = true;
+
+						var numCollisionModes = Enum.GetValues(typeof(EditMode)).Length;
+						editMode++;
+						if ((int)editMode >= numCollisionModes)
+							editMode = 0;
+
+						uiManager.GetComponent("modeLbl").Text = editMode.ToString();
 					}
 				}
 				else
 				{
-					collisionViewPressed = false;
+					editModeCyclePressed = false;
 				}
 
 				if (tileX >= world.CurrentRoom.Width)
@@ -210,9 +251,9 @@ namespace TroidRoomEditor
 				if (tileY < 0)
 					tileY = 0;
 
-				if (!uiManager.UIClicked)
+				if (!uiManager.UIInUse && !uiManager.UIClicked)
 				{
-					if (!editCollisionsMode)
+					if (editMode == EditMode.Tile)
 					{
 						if (ms.LeftButton == ButtonState.Pressed)
 						{
@@ -223,12 +264,22 @@ namespace TroidRoomEditor
 							world.CurrentRoom.Tiles[tileX, tileY] = null;
 						}
 					}
-					else
+					else if (editMode == EditMode.Collision)
 					{
 						if (ms.LeftButton == ButtonState.Pressed)
 						{
 							if (world.CurrentRoom.Tiles[tileX, tileY] != null)
 								world.CurrentRoom.Tiles[tileX, tileY].CollisionType = currentCollisionMode;
+						}
+					}
+					else if (editMode == EditMode.Door)
+					{
+						if (ms.LeftButton == ButtonState.Pressed && !uiManager.GetComponent("doorPromptBox").Visible)
+						{
+							uiManager.GetComponent("doorPromptBox").Visible = true;
+							uiManager.GetComponent("connectToRoomTxt").Visible = true;
+							uiManager.GetComponent("connectingDoorNameTxt").Visible = true;
+							doorPlacePosition = new Vector2(tileX * Tile.TILE_WIDTH, tileY * Tile.TILE_HEIGHT);
 						}
 					}
 				}
@@ -252,9 +303,16 @@ namespace TroidRoomEditor
 			world.Draw(spriteBatch);
 			DrawBorder(currentMouseBlock, 1, Color.Magenta);
 
-			if (editCollisionsMode)
+			if (editMode == EditMode.Collision)
 			{
 				world.CurrentRoom.DrawCollisionBoxes(spriteBatch, DrawBorder);
+			}
+			else if (editMode == EditMode.Door)
+			{
+				foreach (Entity entity in world.CurrentRoom.GetEntities())
+				{
+					DrawBorder(entity.Hitbox, 1, Color.Blue);
+				}
 			}
 
 			spriteBatch.End();
@@ -290,11 +348,12 @@ namespace TroidRoomEditor
 
 		void SaveButton_OnClick()
 		{
-			TroidEngine.ContentReaders.Contracts.RoomDataContract rc = new TroidEngine.ContentReaders.Contracts.RoomDataContract();
+			RoomDataContract rc = new RoomDataContract();
 			rc.Data = new TileDataContract[world.CurrentRoom.Width * world.CurrentRoom.Height];
 
 			rc.Width = world.CurrentRoom.Width;
 			rc.Height = world.CurrentRoom.Height;
+			rc.Name = uiManager.GetComponent("textBox").Text;
 
 			for (int i = 0; i < rc.Data.Length; i++)
 			{
@@ -304,6 +363,24 @@ namespace TroidRoomEditor
 				rc.Data[i] = new TileDataContract();
 				rc.Data[i].ID = world.CurrentRoom.GetTileID(x, y);
 				rc.Data[i].CollisionType = (int)world.CurrentRoom.GetTileCollision(x, y);
+			}
+
+			rc.Doors = new List<DoorDataContract>();
+			foreach (Entity entity in world.CurrentRoom.GetEntities())
+			{
+				if (entity is Door)
+				{
+					Door door = entity as Door;
+
+					DoorDataContract ddc = new DoorDataContract();
+					ddc.X = (int)door.Position.X;
+					ddc.Y = (int)door.Position.Y;
+					ddc.Name = door.Name;
+					ddc.ConnectingRoomName = door.ConnectingRoomName;
+					ddc.ConnectingDoorName = door.ConnectingDoorName;
+
+					rc.Doors.Add(ddc);
+				}
 			}
 
 			using (MemoryStream ms = new MemoryStream())
@@ -385,6 +462,18 @@ namespace TroidRoomEditor
 				world.AddRoom(room);
 				world.CurrentRoom = room;
 			}
+		}
+
+		void PromptTextBox_OnEnter()
+		{
+			uiManager.GetComponent("doorPromptBox").Visible = false;
+			uiManager.GetComponent("connectToRoomTxt").Visible = false;
+			uiManager.GetComponent("connectingDoorNameTxt").Visible = false;
+
+			Door door = new Door(uiManager.GetComponent("connectingDoorNameTxt").Text, doorPlacePosition);
+			door.ConnectingRoomName = uiManager.GetComponent("connectToRoomTxt").Text;
+
+			world.CurrentRoom.AddEntity(door);
 		}
 	}
 }

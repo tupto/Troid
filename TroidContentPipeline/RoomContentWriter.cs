@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.Content.Pipeline.Serialization.Compiler;
 
 using TWrite = TroidEngine.World.Room;
 using System.Text;
+using TroidEngine.Entities;
 
 namespace TroidContentPipeline
 {
@@ -23,24 +24,41 @@ namespace TroidContentPipeline
 
         protected override void Write(ContentWriter output, TWrite value)
         {
+			output.Write(value.Name);
             output.Write(value.Height);
             output.Write(value.Width);
-			int minonec = 0;
 			for (int y = 0; y < value.Height; y++)
 			{
 				for (int x = 0; x < value.Width; x++)
 				{
 					int id = value.GetTileID(x, y);
-					if (id == -1)
-					{
-						minonec++;
-					}
+
 					output.Write(id);
 					output.Write((int)value.GetTileCollision(x, y));
 				}
 			}
 
-			//throw new Exception("it was not 0 " + minonec + " times");
+			int numDoors = 0;
+			List<Door> doors = new List<Door>();
+			foreach (Entity entity in value.GetEntities())
+			{
+				if (entity is Door)
+				{
+					numDoors++;
+					Door de = entity as Door;
+					doors.Add(de);
+				}
+			}
+
+			output.Write(numDoors);
+			foreach (Door de in doors)
+			{
+				output.Write((int)de.Position.X);
+				output.Write((int)de.Position.Y);
+				output.Write(de.Name ?? "door");
+				output.Write(de.ConnectingRoomName ?? "room");
+				output.Write(de.ConnectingDoorName ?? de.Name ?? "door");
+			}
         }
     }
 }

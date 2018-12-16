@@ -1,8 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework.Content.Pipeline;
+using TroidEngine.ContentReaders.Contracts;
 using TroidEngine.World;
-using TroidContentPipeline.Contracts;
-
 using TInput = TroidEngine.ContentReaders.Contracts.RoomDataContract;
 using TOutput = TroidEngine.World.Room;
 
@@ -28,6 +27,7 @@ namespace TroidContentPipeline
             int height = input.Height;
 
             TOutput room = new TOutput(width, height);
+			room.Name = input.Name;
 
 			if (width * height != input.Data.Length)
 				throw new ArgumentException("Data length must equal height * width");
@@ -43,6 +43,17 @@ namespace TroidContentPipeline
 					room.Tiles[x, y] = new Tile(input.Data[x + y * width].ID);
 					room.Tiles[x, y].CollisionType = (TileCollision)input.Data[x + y * width].CollisionType;
 				}
+			}
+
+			foreach (DoorDataContract door in input.Doors)
+			{
+				TroidEngine.Entities.Door de = new TroidEngine.Entities.Door(
+					door.Name, new Microsoft.Xna.Framework.Vector2(door.X, door.Y)
+				);
+				de.ConnectingRoomName = door.ConnectingRoomName;
+				de.ConnectingDoorName = door.ConnectingDoorName;
+
+				room.AddEntity(de);
 			}
 
             return room;

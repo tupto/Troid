@@ -7,7 +7,6 @@ using Microsoft.Xna.Framework.Content.Pipeline;
 using TroidEngine.World;
 using System.Runtime.Serialization.Json;
 using System.Runtime.Serialization;
-using TroidContentPipeline.Contracts;
 
 using TImport = TroidEngine.ContentReaders.Contracts.RoomDataContract;
 
@@ -38,7 +37,7 @@ namespace TroidContentPipeline
 			{
 				try
                 {
-                    DataContractJsonSerializer dataSerializer = new DataContractJsonSerializer(typeof(RoomDataContract));
+					DataContractJsonSerializer dataSerializer = new DataContractJsonSerializer(typeof(TImport));
 					roomContract = (TImport)dataSerializer.ReadObject(memoryStream);
 				}
 				catch (SerializationException e)

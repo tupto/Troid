@@ -13,6 +13,7 @@ namespace TroidEngine.Entities
 {
 	public abstract class Entity
 	{
+		public string Name;
 		public Dictionary<string, Animation> Animations;
 		public string CurrAnimation;
 		public Texture2D SpriteSheet;
@@ -62,9 +63,9 @@ namespace TroidEngine.Entities
 		protected Vector2 knockbackDirection;
 		protected bool somethingBelow;
 
-		public Entity(World.World world)
+		public Entity(string name)
 		{
-			World = world;
+			Name = name;
 			Animations = new Dictionary<string, Animation>();
 			Position = Vector2.Zero;
 			Velocity = Vector2.Zero;

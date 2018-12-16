@@ -48,6 +48,9 @@
     <Compile Include="Graphics\UI\UIManager.cs" />
     <Compile Include="ContentReaders\Contracts\RoomDataContract.cs" />
     <Compile Include="ContentReaders\Contracts\TileDataContract.cs" />
+    <Compile Include="Graphics\UI\Label.cs" />
+    <Compile Include="Graphics\UI\Box.cs" />
+    <Compile Include="ContentReaders\Contracts\DoorDataContract.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Entities\" />

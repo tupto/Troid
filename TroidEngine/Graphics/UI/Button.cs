@@ -16,6 +16,13 @@ namespace TroidEngine.Graphics.UI
 			BodyColour = Color.Gray;
 			HoverColour = Color.DarkGray;
 			TextColour = Color.Black;
+
+			OnClick += Button_OnClick;
+		}
+
+		private void Button_OnClick()
+		{
+			HasFocus = false;
 		}
 	}
 }

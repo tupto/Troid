@@ -11,7 +11,7 @@ namespace TroidEngine.Entities
 {
 	public abstract class TriggerEntity : Entity
 	{
-		public TriggerEntity(World.World world, Vector2 position) : base(world)
+		public TriggerEntity(string name, Vector2 position) : base(name)
 		{
 			Position = position;
 		}

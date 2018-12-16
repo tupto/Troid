@@ -1,11 +1,14 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace TroidEngine.ContentReaders.Contracts
 {
     [DataContract]
     public class RoomDataContract
     {
-        
+		[DataMember(Name = "name")]
+		public string Name;
+
         [DataMember(Name = "width")]
 		public int Width;
 
@@ -14,5 +17,8 @@ namespace TroidEngine.ContentReaders.Contracts
 
 		[DataMember(Name = "data")]
 		public TileDataContract[] Data;
+
+		[DataMember(Name = "doors")]
+		public List<DoorDataContract> Doors;
     }
 }

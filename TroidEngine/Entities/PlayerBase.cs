@@ -6,7 +6,7 @@ namespace TroidEngine.Entities
 {
 	public class PlayerBase : Entity
 	{
-		public PlayerBase(World.World world) : base(world)
+		public PlayerBase() : base("player")
 		{
 		}
 	}

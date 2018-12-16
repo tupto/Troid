@@ -10,23 +10,21 @@ namespace TroidEngine.Entities
 {
 	public class Door : TriggerEntity
 	{
-		public int ConnectingRoomId;
+		public string ConnectingRoomName;
+		public string ConnectingDoorName;
 
-		public Door(World.World world, Vector2 position)
-			: base(world, position)
+		public Door(string name, Vector2 position)
+			: base(name, position)
 		{
 			Hitbox = new Rectangle((int)Position.X, (int)Position.Y, 8, 16);
-			ConnectingRoomId = 0;
+			ConnectingRoomName = null;
 		}
 
 		public override void OnEntityHit(Entity entity)
 		{
 			if (entity is PlayerBase)
 			{
-				PlayerBase player = entity as PlayerBase;
-				player.Position = new Vector2(20, 20);
-
-				World.LoadRoom(ConnectingRoomId);
+				World.LoadRoom(ConnectingRoomName, ConnectingDoorName);
 			}
 		}
 	}
